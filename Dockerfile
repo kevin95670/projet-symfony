@@ -1,10 +1,6 @@
 FROM php:8.2-apache
 
-# On vide tous les MPM, on en active un seul, et on valide la config
-RUN rm -f /etc/apache2/mods-enabled/mpm_*.conf /etc/apache2/mods-enabled/mpm_*.load \
-    && a2enmod mpm_prefork rewrite \
-    && ls -la /etc/apache2/mods-enabled/ | grep mpm \
-    && apache2ctl -t
+RUN a2enmod rewrite
 
 RUN apt-get update && apt-get install -y \
     libzip-dev \
@@ -30,3 +26,7 @@ COPY . .
 RUN composer install --no-dev --optimize-autoloader --no-interaction --no-scripts
 
 RUN chown -R www-data:www-data /var/www/html/var
+
+COPY docker-entrypoint.sh /usr/local/bin/
+RUN chmod +x /usr/local/bin/docker-entrypoint.sh
+CMD ["/usr/local/bin/docker-entrypoint.sh"]
