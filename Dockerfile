@@ -21,6 +21,9 @@ ENV PATH="/root/.symfony5/bin:$PATH"
 
 COPY apache-config.conf /etc/apache2/sites-available/000-default.conf
 
+ENV APP_ENV=prod
+ENV APP_DEBUG=0
+
 WORKDIR /var/www/html
 COPY . .
 RUN composer install --no-dev --optimize-autoloader --no-interaction \
