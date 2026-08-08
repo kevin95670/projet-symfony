@@ -3,6 +3,8 @@ FROM php:8.2-apache
 # Un seul MPM autorisé : on désactive les autres avant d'activer prefork
 RUN a2dismod mpm_event mpm_worker 2>/dev/null; a2enmod mpm_prefork rewrite
 
+RUN ls -la /etc/apache2/mods-enabled/ | grep mpm
+
 # Dépendances système (avant les extensions PHP qui en dépendent)
 RUN apt-get update && apt-get install -y \
     libzip-dev \
