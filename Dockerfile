@@ -23,7 +23,7 @@ COPY apache-config.conf /etc/apache2/sites-available/000-default.conf
 
 WORKDIR /var/www/html
 COPY . .
-RUN composer install --no-dev --optimize-autoloader --no-interaction --no-scripts
+RUN composer install --no-dev --optimize-autoloader --no-interaction
 
 RUN mkdir -p /var/www/html/var && chown -R www-data:www-data /var/www/html/var
 
