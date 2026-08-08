@@ -26,6 +26,9 @@ services:
       dockerfile: Dockerfile          # attention à la casse exacte du nom de fichier chez toi
     container_name: php-symfony
     restart: always
+    environment:
+      APP_ENV: dev
+      APP_DEBUG: 1
     volumes:
       - .:/var/www/html               # ton code (sur ta machine) est monté en live dans le conteneur
     ports:
