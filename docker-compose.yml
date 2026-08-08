@@ -1,0 +1,35 @@
+services:
+  db:
+    image: mariadb                    # image officielle MariaDB, pas de Dockerfile custom
+    container_name: mariadb-symfony
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+    ports:
+      - 3306:3306                     # utile si tu veux te connecter depuis un client externe (ex: DBeaver) sur ta machine
+    volumes:
+      - db_data:/var/lib/mysql        # persiste les données de la base, même si le conteneur est supprimé
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: phpmyadmin-symfony
+    restart: always
+    environment:
+      PMA_HOST: db                    # "db" = nom du service MariaDB juste au-dessus, Docker résout ça automatiquement
+      PMA_PORT: 3306
+    ports:
+      - 8082:80                       # accessible sur http://localhost:8082
+
+  php:
+    build:
+      context: .                      # "." car le docker-compose.yml est déjà dans le même dossier que le Dockerfile
+      dockerfile: Dockerfile          # attention à la casse exacte du nom de fichier chez toi
+    container_name: php-symfony
+    restart: always
+    volumes:
+      - .:/var/www/html               # ton code (sur ta machine) est monté en live dans le conteneur
+    ports:
+      - 8080:80                       # accessible sur http://localhost:8080 (Apache écoute sur le port 80 à l'intérieur)
+
+volumes:
+  db_data:                            # déclare le volume nommé utilisé par le service "db"
