@@ -23,6 +23,7 @@ COPY apache-config.conf /etc/apache2/sites-available/000-default.conf
 
 ENV APP_ENV=prod
 ENV APP_DEBUG=0
+ENV COMPOSER_ALLOW_SUPERUSER=1
 
 WORKDIR /var/www/html
 COPY . .
