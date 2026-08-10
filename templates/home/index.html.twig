@@ -3,18 +3,54 @@
 {% block title %}Hello HomeController!{% endblock %}
 
 {% block body %}
-<style>
-    .example-wrapper { margin: 1em auto; max-width: 800px; width: 95%; font: 18px/1.5 sans-serif; }
-    .example-wrapper code { background: #F5F5F5; padding: 2px 6px; }
-</style>
 
-<div class="example-wrapper">
-    <h1>Hello {{ controller_name }}! ✅</h1>
+<div class="max-w-7xl mx-auto px-4 py-12">
 
-    This friendly message is coming from:
-    <ul>
-        <li>Your controller at <code>/var/www/html/src/Controller/HomeController.php</code></li>
-        <li>Your template at <code>/var/www/html/templates/home/index.html.twig</code></li>
-    </ul>
+    <div class="flex items-baseline justify-between mb-6">
+        <h2 class="text-2xl font-bold text-white">Dernières annonces</h2>
+        <a href="#" class="text-sm text-slate-400 hover:text-white transition">Voir tout →</a>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {% for vente in last_ventes %}
+            <article class="group bg-slate-900 border border-slate-800 rounded-xl overflow-hidden hover:border-slate-700 transition">
+
+                <div class="aspect-4/3 bg-slate-800 overflow-hidden">
+                    {% if vente.image %}
+                        <img src="{{ vente.image }}" alt="{{ vente.titre }}"
+                             class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
+                    {% else %}
+                        <div class="w-full h-full flex items-center justify-center text-slate-600 text-sm">
+                            Pas d'image
+                        </div>
+                    {% endif %}
+                </div>
+
+                <div class="p-5">
+                    <div class="flex items-start justify-between gap-3 mb-2">
+                        <h3 class="font-semibold text-white leading-snug">{{ vente.titre }}</h3>
+                        <span class="shrink-0 text-lg font-bold text-white">{{ vente.prix }} €</span>
+                    </div>
+
+                    <p class="text-sm text-slate-400 line-clamp-2 mb-4">{{ vente.description }}</p>
+
+                    <div class="flex flex-wrap gap-2 mb-4">
+                        <span class="px-2 py-0.5 text-xs rounded bg-slate-800 text-slate-300">{{ vente.plateforme }}</span>
+                        <span class="px-2 py-0.5 text-xs rounded bg-slate-800 text-slate-300">{{ vente.etat.value }}</span>
+                        {% if vente.pegi %}
+                            <span class="px-2 py-0.5 text-xs rounded bg-slate-800 text-slate-300">PEGI {{ vente.pegi.value }}</span>
+                        {% endif %}
+                    </div>
+
+                    <div class="flex items-center justify-between pt-4 border-t border-slate-800">
+                        <span class="text-sm text-slate-400">{{ vente.vendeur.pseudo }}</span>
+                        <a href="#" class="text-sm font-medium text-cyan-400 hover:text-cyan-300 transition">Voir →</a>
+                    </div>
+                </div>
+
+            </article>
+        {% endfor %}
+    </div>
+
 </div>
 {% endblock %}
