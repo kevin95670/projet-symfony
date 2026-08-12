@@ -46,6 +46,7 @@ class AppFixtures extends Fixture
             $user->setPseudo($faker->unique()->userName());
             $user->setDateNaissance($faker->dateTimeBetween('-50 years', '-5 years'));
             $user->setTelephone($faker->phoneNumber());
+            $user->setDateCreation($faker->dateTimeBetween('-5 years', 'now'));
             $manager->persist($user);
             $users[] = $user;
         }
@@ -66,6 +67,7 @@ class AppFixtures extends Fixture
             $jeu->setTitre($jeuData['titre']);
             $jeu->setDescription($jeuData['description']);
             $jeu->setPrix($jeuData['prix']);
+            $jeu->setSlug($slugger->slug($jeuData['titre'])->lower()->toString());
             $jeu->setDateCreation($jeuData['date_creation']);
             $jeu->setPlateforme($jeuData['plateforme']);
             $jeu->setPegi($jeuData['pegi']);

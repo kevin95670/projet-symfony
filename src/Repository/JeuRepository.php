@@ -59,4 +59,13 @@ class JeuRepository extends ServiceEntityRepository
 
             return $qb->getQuery()->getResult();
         }
+
+        public function findOneBySlug(string $slug): ?Jeu
+        {
+            return $this->createQueryBuilder('j')
+                ->andWhere('j.slug = :slug')
+                ->setParameter('slug', $slug)
+                ->getQuery()
+                ->getOneOrNullResult();
+        }
 }

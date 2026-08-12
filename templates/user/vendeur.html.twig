@@ -1,0 +1,86 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ vendeur.pseudo }} — Profil vendeur{% endblock %}
+
+{% block body %}
+<div class="max-w-7xl mx-auto px-4 py-12">
+
+    {# En-tête vendeur #}
+    <div class="flex flex-col sm:flex-row sm:items-center gap-6 pb-8 mb-10 border-b border-slate-800">
+
+        <img class="w-24 h-24 rounded-full bg-slate-800 ring-2 ring-slate-700 shrink-0"
+             src="https://api.dicebear.com/9.x/avataaars/svg?seed={{ vendeur.pseudo }}"
+             alt="Avatar de {{ vendeur.pseudo }}">
+
+        <div class="flex-1">
+            <h1 class="text-3xl font-bold text-white mb-2">{{ vendeur.pseudo }}</h1>
+            <p class="text-sm text-slate-400">
+                {% if vendeur.dateCreation %}
+                    Membre depuis {{ vendeur.dateCreation|date('F Y') }}
+                {% endif %}
+            </p>
+        </div>
+
+        <div class="flex gap-8 sm:border-l sm:border-slate-800 sm:pl-8">
+            <div>
+                <div class="text-2xl font-bold text-white">{{ vendeur.jeux|length }}</div>
+                <div class="text-xs text-slate-500 uppercase tracking-wide">Annonces</div>
+            </div>
+        </div>
+
+    </div>
+
+    {# Annonces #}
+    <h2 class="text-xl font-bold text-white mb-6">Ses annonces</h2>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {% if vendeur.jeux|length > 0 %}
+            {% for vente in vendeur.jeux %}
+            <article class="group bg-slate-900 border border-slate-800 rounded-xl overflow-hidden hover:border-slate-700 transition">
+
+                <div class="aspect-4/3 bg-slate-800 overflow-hidden">
+                    {% if vente.image %}
+                        <img src="{{ vente.image }}" alt="{{ vente.titre }}"
+                             class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
+                    {% else %}
+                        <div class="w-full h-full flex items-center justify-center text-slate-600 text-sm">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 0 0 1.5-1.5V6a1.5 1.5 0 0 0-1.5-1.5H3.75A1.5 1.5 0 0 0 2.25 6v12a1.5 1.5 0 0 0 1.5 1.5Zm10.5-11.25h.008v.008h-.008V8.25Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z" />
+                            </svg>
+                        </div>
+                    {% endif %}
+                </div>
+
+                <div class="p-5">
+                    <div class="flex items-start justify-between gap-3 mb-2">
+                        <h3 class="font-semibold text-white leading-snug">{{ vente.titre }}</h3>
+                        <span class="shrink-0 text-lg font-bold text-white">{{ vente.prix }} €</span>
+                    </div>
+
+                    <p class="text-sm text-slate-400 line-clamp-2 mb-4">{{ vente.description }}</p>
+
+                    <div class="flex flex-wrap gap-2 mb-4">
+                        <span class="px-2 py-0.5 text-xs rounded bg-slate-800 text-slate-300">{{ vente.plateforme }}</span>
+                        <span class="px-2 py-0.5 text-xs rounded bg-slate-800 text-slate-300">{{ vente.etat.value }}</span>
+                        {% if vente.pegi %}
+                            <span class="px-2 py-0.5 text-xs rounded bg-slate-800 text-slate-300">PEGI {{ vente.pegi.value }}</span>
+                        {% endif %}
+                    </div>
+
+                    <div class="flex items-center justify-between pt-4 border-t border-slate-800">
+                        <a href="{{ path('app_jeu', {'slug': vente.slug, 'id': vente.id}) }}" class="text-sm font-medium text-cyan-400 hover:text-cyan-300 transition">Voir →</a>
+                    </div>
+                </div>
+
+            </article>
+        {% endfor %}
+    </div>
+        {% else %}
+            <p class="col-span-full text-slate-500 py-12 text-center">
+                Ce vendeur n'a aucune annonce en ligne.
+            </p>
+        {% endif %}
+    </div>
+
+</div>
+{% endblock %}

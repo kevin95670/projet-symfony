@@ -65,6 +65,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(targetEntity: Commande::class, mappedBy: 'user')]
     private Collection $commandes;
 
+    #[ORM\Column(type: Types::DATE_MUTABLE)]
+    private ?\DateTime $dateCreation = null;
+
     public function __construct()
     {
         $this->jeux = new ArrayCollection();
@@ -285,6 +288,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
                 $commande->setUser(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getDateCreation(): ?\DateTime
+    {
+        return $this->dateCreation;
+    }
+
+    public function setDateCreation(\DateTime $dateCreation): static
+    {
+        $this->dateCreation = $dateCreation;
 
         return $this;
     }

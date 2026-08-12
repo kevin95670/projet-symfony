@@ -68,6 +68,9 @@ class Jeu
     #[ORM\OneToMany(targetEntity: CommandeLignes::class, mappedBy: 'jeu')]
     private Collection $commandeLignes;
 
+    #[ORM\Column(length: 255)]
+    private ?string $slug = null;
+
     public function __construct()
     {
         $this->categories = new ArrayCollection();
@@ -283,6 +286,18 @@ class Jeu
                 $commandeLigne->setJeu(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getSlug(): ?string
+    {
+        return $this->slug;
+    }
+
+    public function setSlug(string $slug): static
+    {
+        $this->slug = $slug;
 
         return $this;
     }
