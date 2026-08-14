@@ -37,8 +37,8 @@
 
                 {# Liens de navigation - cachés sur mobile #}
                 <div class="hidden md:flex items-center gap-6">
-                    <a href="#" class="text-slate-300 hover:text-white transition">Jeux</a>
-                    <a href="#" class="text-slate-300 hover:text-white transition">Vendre</a>
+                    <a href="#" class="text-slate-300 hover:text-white transition">Acheter un jeu</a>
+                    <a href="#" class="text-slate-300 hover:text-white transition">Vendre un jeu</a>
                     <a href="#" class="text-slate-300 hover:text-white transition">Ma liste de souhaits</a>
                 </div>
 
@@ -50,7 +50,7 @@
                     </svg>
                     </a>
 
-                    <a href="#" class="text-slate-300 hover:text-white transition" title="Mon profil">
+                    <a href="{{ app.user ? path('app_profil') : path('app_login') }}" class="text-slate-300 hover:text-white transition" title="Mon profil">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                     </svg>

@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Repository\AvisRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -18,7 +19,7 @@ final class UserController extends AbstractController
     }
 
     #[Route('/vendeur/{pseudo}', name: 'vue_vendeur')]
-    public function apercu_vendeur(UserRepository $userRepository, string $pseudo): Response
+    public function apercu_vendeur(UserRepository $userRepository, AvisRepository $avisRepository, string $pseudo): Response
     {
 
         $vendeur = $userRepository->findOneByPseudo($pseudo);
@@ -26,6 +27,7 @@ final class UserController extends AbstractController
         return $this->render('user/vendeur.html.twig', [
             'controller_name' => 'UserController',
             'vendeur' => $vendeur,
+            'moyenne' => $avisRepository->getMoyenneAvisByVendeur($vendeur),
         ]);
     }
 }

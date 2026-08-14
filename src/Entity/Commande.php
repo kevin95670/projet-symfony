@@ -34,9 +34,16 @@ class Commande
     #[ORM\OneToMany(targetEntity: CommandeLignes::class, mappedBy: 'commande')]
     private Collection $commandeLignes;
 
+    /**
+     * @var Collection<int, Avis>
+     */
+    #[ORM\OneToMany(targetEntity: Avis::class, mappedBy: 'commande')]
+    private Collection $avis;
+
     public function __construct()
     {
         $this->commandeLignes = new ArrayCollection();
+        $this->avis = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -116,6 +123,36 @@ class Commande
             // set the owning side to null (unless already changed)
             if ($commandeLigne->getCommande() === $this) {
                 $commandeLigne->setCommande(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Avis>
+     */
+    public function getAvis(): Collection
+    {
+        return $this->avis;
+    }
+
+    public function addAvi(Avis $avi): static
+    {
+        if (!$this->avis->contains($avi)) {
+            $this->avis->add($avi);
+            $avi->setCommande($this);
+        }
+
+        return $this;
+    }
+
+    public function removeAvi(Avis $avi): static
+    {
+        if ($this->avis->removeElement($avi)) {
+            // set the owning side to null (unless already changed)
+            if ($avi->getCommande() === $this) {
+                $avi->setCommande(null);
             }
         }
 
