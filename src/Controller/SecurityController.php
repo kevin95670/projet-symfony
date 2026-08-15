@@ -24,7 +24,7 @@ class SecurityController extends AbstractController
         ]);
     }
 
-    #[Route(path: '/recover-password', name: 'app_recover_password')]
+    /*#[Route(path: '/recover-password', name: 'app_recover_password')]
     public function recoverPassword(AuthenticationUtils $authenticationUtils): Response
     {
         // get the login error if there is one
@@ -37,7 +37,7 @@ class SecurityController extends AbstractController
             'last_username' => $lastUsername,
             'error' => $error,
         ]);
-    }
+    }*/
 
     #[Route(path: '/logout', name: 'app_logout')]
     public function logout(): void

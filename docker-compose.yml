@@ -34,5 +34,13 @@ services:
     ports:
       - 8080:80                       # accessible sur http://localhost:8080 (Apache écoute sur le port 80 à l'intérieur)
 
+  mailpit:
+    image: axllent/mailpit
+    container_name: mailpit-symfony
+    restart: always
+    ports:
+      - 8025:8025   # interface web
+      - 1025:1025   # serveur SMTP
+
 volumes:
   db_data:                            # déclare le volume nommé utilisé par le service "db"

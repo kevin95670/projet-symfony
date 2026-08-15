@@ -1,0 +1,43 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Mot de passe oublié{% endblock %}
+
+{% block body %}
+<div class="min-h-[70vh] flex items-center justify-center px-4 py-12">
+    <div class="w-full max-w-md">
+
+        <div class="bg-slate-900 border border-slate-800 rounded-xl p-8">
+
+            <h1 class="text-2xl font-bold text-white mb-1">Mot de passe oublié</h1>
+            <p class="text-sm text-slate-400 mb-8">
+                Saisissez votre adresse email, nous vous enverrons un lien pour définir un nouveau mot de passe.
+            </p>
+
+            {% for flash_error in app.flashes('reset_password_error') %}
+                <div class="mb-6 px-4 py-3 rounded-lg bg-red-500/10 border border-red-500/30 text-red-400 text-sm">
+                    {{ flash_error }}
+                </div>
+            {% endfor %}
+
+            {{ form_start(requestForm) }}
+
+                {{ form_row(requestForm.email, { label: 'Adresse email' }) }}
+
+                <button type="submit"
+                        class="w-full bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-semibold py-3 rounded-lg transition">
+                    Envoyer le lien
+                </button>
+
+            {{ form_end(requestForm) }}
+
+        </div>
+
+        <p class="text-center text-sm text-slate-400 mt-6">
+            <a href="{{ path('app_login') }}" class="text-cyan-400 hover:text-cyan-300 font-medium transition">
+                ← Retour à la connexion
+            </a>
+        </p>
+
+    </div>
+</div>
+{% endblock %}

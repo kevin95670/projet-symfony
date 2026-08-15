@@ -3,6 +3,8 @@
 namespace App\Controller;
 
 use App\Entity\User;
+use Symfony\Bridge\Twig\Mime\TemplatedEmail;
+use Symfony\Component\Mime\Address;
 use App\Form\RegistrationFormType;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -27,11 +29,23 @@ class RegistrationController extends AbstractController
 
             // encode the plain password
             $user->setPassword($userPasswordHasher->hashPassword($user, $plainPassword));
+            $user->setDateCreation(new \DateTime('now'));
 
             $entityManager->persist($user);
             $entityManager->flush();
 
             // do anything else you need here, like send an email
+            $email = (new TemplatedEmail())
+            ->from(new Address('kevinleonard.info@gmail.com', 'Kevin'))
+            ->to((string) $user->getEmail())
+            ->subject('Bienvenue sur notre site !')
+            ->htmlTemplate('registration/welcome.html.twig')
+            ->context([
+                'user' => $user,
+            ])
+            ;
+
+            $mailer->send($email);
 
             return $security->login($user, 'form_login', 'main');
         }
