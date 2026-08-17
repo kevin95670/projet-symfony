@@ -68,4 +68,44 @@ class JeuRepository extends ServiceEntityRepository
                 ->getQuery()
                 ->getOneOrNullResult();
         }
+
+        public function countJeux(bool $only_disponible = false): int
+        {
+            $qb = $this->createQueryBuilder('j')
+                ->select('COUNT(j.id)');
+
+            if ($only_disponible) {
+                $qb->andWhere('j.statut = :statut')
+                   ->setParameter('statut', 'disponible');
+            }
+
+            return (int) $qb->getQuery()->getSingleScalarResult();
+        }
+
+        public function findAllByCategorie(string $categorieSlug): array
+        {
+            return $this->createQueryBuilder('j')
+                ->leftJoin('j.categories', 'c')
+                ->addSelect('c')
+                ->leftJoin('j.vendeur', 'v')
+                ->addSelect('v')
+                ->andWhere('c.slug = :slug')
+                ->setParameter('slug', $categorieSlug)
+                ->getQuery()
+                ->getResult();
+        }
+
+        public function findPetitsPrix(int $valeurMax = 15): array
+        {
+            return $this->createQueryBuilder('j')
+                ->leftJoin('j.categories', 'c')
+                ->addSelect('c')
+                ->leftJoin('j.vendeur', 'v')
+                ->addSelect('v')
+                ->andWhere('j.prix <= :prix')
+                ->setParameter('prix', $valeurMax)
+                ->setMaxResults(10)
+                ->getQuery()
+                ->getResult();
+        }
 }

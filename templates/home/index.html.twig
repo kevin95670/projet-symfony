@@ -1,8 +1,66 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Hello HomeController!{% endblock %}
+{% block title %}Ready - Page d'accueil{% endblock %}
 
 {% block body %}
+
+{# Bandeau d'accueil #}
+<div class="relative overflow-hidden border-b border-slate-800">
+
+    {# Halo décoratif #}
+    <div class="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-cyan-500/10 rounded-full blur-3xl pointer-events-none"></div>
+
+    <div class="relative max-w-7xl mx-auto px-4 py-20 text-center">
+
+        <h1 class="text-4xl md:text-5xl font-bold text-white leading-tight mb-6">
+            Vos jeux méritent<br class="hidden sm:block">
+            <span class="text-cyan-400">une seconde partie</span>
+        </h1>
+
+        <p class="text-lg text-slate-400 max-w-2xl mx-auto leading-relaxed mb-10">
+            Achetez et revendez vos jeux entre joueurs. Pas d'intermédiaire, des prix justes, et des titres qui retrouvent une manette.
+        </p>
+
+        <div class="flex flex-col sm:flex-row gap-4 justify-center mb-14">
+            <a href="#" class="bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-semibold py-3 px-8 rounded-lg transition">
+                Parcourir les annonces
+            </a>
+            <a href="#" class="border border-slate-700 hover:border-slate-500 text-slate-300 hover:text-white font-medium py-3 px-8 rounded-lg transition">
+                Vendre un jeu
+            </a>
+        </div>
+
+        {# Chiffres #}
+        <div class="flex justify-center gap-12 sm:gap-20">
+            <div>
+                <div class="text-3xl font-bold text-white">{{ nb_annonces }}</div>
+                <div class="text-xs text-slate-500 uppercase tracking-wider mt-1">Annonces</div>
+            </div>
+            <div>
+                <div class="text-3xl font-bold text-white">{{ nb_membres }}</div>
+                <div class="text-xs text-slate-500 uppercase tracking-wider mt-1">Membres</div>
+            </div>
+            <div>
+                <div class="text-3xl font-bold text-white">{{ nb_categories }}</div>
+                <div class="text-xs text-slate-500 uppercase tracking-wider mt-1">Catégories</div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+{# Catégories #}
+<div class="max-w-7xl mx-auto px-4 pt-12">
+    <h2 class="text-sm font-medium text-slate-500 uppercase tracking-wider mb-4">Explorer par catégorie</h2>
+    <div class="flex flex-wrap gap-2">
+        {% for categorie in categories %}
+            <a href="{{ path('app_jeux_par_categorie', {'slug': categorie.slug}) }}" class="px-4 py-2 text-sm rounded-full bg-slate-900 border border-slate-800 text-slate-300 hover:border-cyan-500 hover:text-cyan-400 transition">
+                {{ categorie.nom }}
+            </a>
+        {% endfor %}
+    </div>
+</div>
+
 
 <div class="max-w-7xl mx-auto px-4 py-12">
 
@@ -37,6 +95,14 @@
                     <p class="text-sm text-slate-400 line-clamp-2 mb-4">{{ vente.description }}</p>
 
                     <div class="flex flex-wrap gap-2 mb-4">
+                        {% if vente.categories %}
+                            {% for categorie in vente.categories %}
+                                <a href="{{ path('app_jeux_par_categorie', {'slug': categorie.slug}) }}"
+                                class="px-2 py-0.5 text-xs rounded bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 hover:bg-cyan-500/30 hover:text-cyan-200 transition font-medium">
+                                    {{ categorie.nom }}
+                                </a>
+                            {% endfor %}
+                        {% endif %}
                         <span class="px-2 py-0.5 text-xs rounded bg-slate-800 text-slate-300">{{ vente.plateforme }}</span>
                         <span class="px-2 py-0.5 text-xs rounded bg-slate-800 text-slate-300">{{ vente.etat.value }}</span>
                         {% if vente.pegi %}
@@ -45,8 +111,92 @@
                     </div>
 
                     <div class="flex items-center justify-between pt-4 border-t border-slate-800">
-                        <a href="{{ path('vue_vendeur', {'pseudo': vente.vendeur.pseudo}) }}" class="text-sm text-slate-400">{{ vente.vendeur.pseudo }}</a>
+                        <a href="{{ path('vue_vendeur', {'pseudo': vente.vendeur.pseudo}) }}"
+                        class="inline-flex items-center gap-1.5 text-sm text-slate-400 hover:text-cyan-300 transition underline decoration-slate-700 hover:decoration-cyan-400 underline-offset-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M17.982 18.725A7.488 7.488 0 0 0 12 15.75a7.488 7.488 0 0 0-5.982 2.975m11.963 0a9 9 0 1 0-11.963 0m11.963 0A8.966 8.966 0 0 1 12 21a8.966 8.966 0 0 1-5.982-2.275M15 9.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                            </svg>
+                            {{ vente.vendeur.pseudo }}
+                        </a>
                         <a href="{{ path('app_jeu', {'slug': vente.slug, 'id': vente.id}) }}" class="text-sm font-medium text-cyan-400 hover:text-cyan-300 transition">Voir →</a>
+                    </div>
+                    {# Actions #}
+                    <div class="flex flex-col sm:flex-row gap-3 mt-3">
+                        <a href="#" class="flex-1 text-center bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-semibold py-3 px-6 rounded-lg transition">
+                            Ajouter au panier
+                        </a>
+                        <a href="#" class="flex items-center justify-center gap-2 border border-slate-700 hover:border-slate-500 text-slate-300 hover:text-white font-medium py-3 px-6 rounded-lg transition">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z" />
+                            </svg>
+                            Wishlist
+                        </a>
+                    </div>
+                </div>
+
+            </article>
+        {% endfor %}
+    </div>
+
+</div>
+
+<div class="max-w-7xl mx-auto px-4 py-12">
+
+    <div class="flex items-baseline justify-between mb-6">
+        <h2 class="text-2xl font-bold text-white">Jeux petits budgets</h2>
+        <a href="#" class="text-sm text-slate-400 hover:text-white transition">Voir tout →</a>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {% for jeu in jeux_petits_budget %}
+            <article class="group bg-slate-900 border border-slate-800 rounded-xl overflow-hidden hover:border-slate-700 transition">
+
+                <div class="aspect-4/3 bg-slate-800 overflow-hidden">
+                    {% if jeu.image %}
+                        <img src="{{ jeu.image }}" alt="{{ jeu.titre }}"
+                             class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
+                    {% else %}
+                        <div class="w-full h-full flex items-center justify-center text-slate-600 text-sm">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 0 0 1.5-1.5V6a1.5 1.5 0 0 0-1.5-1.5H3.75A1.5 1.5 0 0 0 2.25 6v12a1.5 1.5 0 0 0 1.5 1.5Zm10.5-11.25h.008v.008h-.008V8.25Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z" />
+                            </svg>
+                        </div>
+                    {% endif %}
+                </div>
+
+                <div class="p-5">
+                    <div class="flex items-start justify-between gap-3 mb-2">
+                        <h3 class="font-semibold text-white leading-snug">{{ jeu.titre }}</h3>
+                        <span class="shrink-0 text-lg font-bold text-white">{{ jeu.prix }} €</span>
+                    </div>
+
+                    <p class="text-sm text-slate-400 line-clamp-2 mb-4">{{ jeu.description }}</p>
+
+                    <div class="flex flex-wrap gap-2 mb-4">
+                        {% if jeu.categories %}
+                            {% for categorie in jeu.categories %}
+                                <a href="{{ path('app_jeux_par_categorie', {'slug': categorie.slug}) }}"
+                                class="px-2 py-0.5 text-xs rounded bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 hover:bg-cyan-500/30 hover:text-cyan-200 transition font-medium">
+                                    {{ categorie.nom }}
+                                </a>
+                            {% endfor %}
+                        {% endif %}
+                        <span class="px-2 py-0.5 text-xs rounded bg-slate-800 text-slate-300">{{ jeu.plateforme }}</span>
+                        <span class="px-2 py-0.5 text-xs rounded bg-slate-800 text-slate-300">{{ jeu.etat.value }}</span>
+                        {% if jeu.pegi %}
+                            <span class="px-2 py-0.5 text-xs rounded bg-slate-800 text-slate-300">PEGI {{ jeu.pegi.value }}</span>
+                        {% endif %}
+                    </div>
+
+                    <div class="flex items-center justify-between pt-4 border-t border-slate-800">
+                        <a href="{{ path('vue_vendeur', {'pseudo': jeu.vendeur.pseudo}) }}"
+                        class="inline-flex items-center gap-1.5 text-sm text-slate-400 hover:text-cyan-300 transition underline decoration-slate-700 hover:decoration-cyan-400 underline-offset-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M17.982 18.725A7.488 7.488 0 0 0 12 15.75a7.488 7.488 0 0 0-5.982 2.975m11.963 0a9 9 0 1 0-11.963 0m11.963 0A8.966 8.966 0 0 1 12 21a8.966 8.966 0 0 1-5.982-2.275M15 9.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                            </svg>
+                            {{ jeu.vendeur.pseudo }}
+                        </a>
+                        <a href="{{ path('app_jeu', {'slug': jeu.slug, 'id': jeu.id}) }}" class="text-sm font-medium text-cyan-400 hover:text-cyan-300 transition">Voir →</a>
                     </div>
                     {# Actions #}
                     <div class="flex flex-col sm:flex-row gap-3 mt-3">
