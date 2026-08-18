@@ -95,6 +95,7 @@ class JeuRepository extends ServiceEntityRepository
                 ->getResult();
         }
 
+        //Prix de 15€ max
         public function findPetitsPrix(int $valeurMax = 15): array
         {
             return $this->createQueryBuilder('j')
