@@ -116,7 +116,8 @@ class JeuRepository extends ServiceEntityRepository
                 ->leftJoin('j.categories', 'c')
                 ->addSelect('c')
                 ->leftJoin('j.vendeur', 'v')
-                ->addSelect('v');
+                ->addSelect('v')
+                ->distinct();
 
             if (!empty($criteres['query'])) {
                 $qb->andWhere('j.titre LIKE :query OR j.description LIKE :query OR c.nom LIKE :query OR v.pseudo LIKE :query')
@@ -143,7 +144,7 @@ class JeuRepository extends ServiceEntityRepository
                 ->setParameter('pegi', $criteres['pegi']);
             }
 
-            return $qb->groupBy('j.id')->getQuery()->getResult();
+            return $qb->getQuery()->getResult();
         }
 
         public function getAll(): array
