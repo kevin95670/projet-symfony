@@ -109,4 +109,51 @@ class JeuRepository extends ServiceEntityRepository
                 ->getQuery()
                 ->getResult();
         }
+
+        public function findAllByRecherche(array $criteres = []): array
+        {
+            $qb = $this->createQueryBuilder('j')
+                ->leftJoin('j.categories', 'c')
+                ->addSelect('c')
+                ->leftJoin('j.vendeur', 'v')
+                ->addSelect('v');
+
+            if (!empty($criteres['query'])) {
+                $qb->andWhere('j.titre LIKE :query OR j.description LIKE :query OR c.nom LIKE :query OR v.pseudo LIKE :query')
+                ->setParameter('query', '%' . $criteres['query'] . '%');
+            }
+
+            if (!empty($criteres['categorySlug'])) {
+                $qb->andWhere('c.slug = :categorySlug')
+                ->setParameter('categorySlug', $criteres['categorySlug']);
+            }
+
+            if (!empty($criteres['prixMax'])) {
+                $qb->andWhere('j.prix <= :prixMax')
+                ->setParameter('prixMax', $criteres['prixMax']);
+            }
+
+            if (!empty($criteres['prixMin'])) {
+                $qb->andWhere('j.prix >= :prixMin')
+                ->setParameter('prixMin', $criteres['prixMin']);
+            }
+
+            if (!empty($criteres['pegi'])) {
+                $qb->andWhere('j.pegi = :pegi')
+                ->setParameter('pegi', $criteres['pegi']);
+            }
+
+            return $qb->groupBy('j.id')->getQuery()->getResult();
+        }
+
+        public function getAll(): array
+        {
+            return $this->createQueryBuilder('j')
+                ->leftJoin('j.categories', 'c')
+                ->addSelect('c')
+                ->leftJoin('j.vendeur', 'v')
+                ->addSelect('v')
+                ->getQuery()
+                ->getResult();
+        }
 }

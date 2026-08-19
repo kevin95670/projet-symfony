@@ -103,7 +103,7 @@
                                 </a>
                             {% endfor %}
                         {% endif %}
-                        <span class="px-2 py-0.5 text-xs rounded bg-slate-800 text-slate-300">{{ vente.plateforme }}</span>
+                        <span class="px-2 py-0.5 text-xs rounded bg-slate-800 text-slate-300">{{ vente.plateforme.value }}</span>
                         <span class="px-2 py-0.5 text-xs rounded bg-slate-800 text-slate-300">{{ vente.etat.value }}</span>
                         {% if vente.pegi %}
                             <span class="px-2 py-0.5 text-xs rounded bg-slate-800 text-slate-300">PEGI {{ vente.pegi.value }}</span>
@@ -181,7 +181,7 @@
                                 </a>
                             {% endfor %}
                         {% endif %}
-                        <span class="px-2 py-0.5 text-xs rounded bg-slate-800 text-slate-300">{{ jeu.plateforme }}</span>
+                        <span class="px-2 py-0.5 text-xs rounded bg-slate-800 text-slate-300">{{ jeu.plateforme.value }}</span>
                         <span class="px-2 py-0.5 text-xs rounded bg-slate-800 text-slate-300">{{ jeu.etat.value }}</span>
                         {% if jeu.pegi %}
                             <span class="px-2 py-0.5 text-xs rounded bg-slate-800 text-slate-300">PEGI {{ jeu.pegi.value }}</span>

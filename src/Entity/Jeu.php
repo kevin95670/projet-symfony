@@ -5,6 +5,7 @@ namespace App\Entity;
 use App\Enum\JeuStatut;
 use App\Enum\Etat;
 use App\Enum\Pegi;
+use App\Enum\Plateforme;
 use App\Repository\JeuRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -31,8 +32,8 @@ class Jeu
     #[ORM\Column(type: Types::DATE_MUTABLE)]
     private ?\DateTime $date_creation = null;
 
-    #[ORM\Column(length: 255)]
-    private ?string $plateforme = null;
+    #[ORM\Column]
+    private ?Plateforme $plateforme = null;
 
     #[ORM\Column]
     private ?Pegi $pegi = null;
@@ -131,12 +132,12 @@ class Jeu
         return $this;
     }
 
-    public function getPlateforme(): ?string
+    public function getPlateforme(): ?Plateforme
     {
         return $this->plateforme;
     }
 
-    public function setPlateforme(string $plateforme): static
+    public function setPlateforme(Plateforme $plateforme): static
     {
         $this->plateforme = $plateforme;
 

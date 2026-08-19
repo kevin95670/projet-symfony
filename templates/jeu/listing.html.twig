@@ -1,11 +1,79 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Liste des jeux - {{ categorie.nom }}{% endblock %}
+{% block title %}
+    {% if query %}Résultats pour "{{ query }}"{% else %}Liste des jeux{% endif %}
+{% endblock %}
 
 {% block body %}
     <div class="max-w-6xl mx-auto px-4 py-8">
-        <h1 class="text-2xl font-bold text-white mb-6">Jeux dans la catégorie {{ categorie.nom }}</h1>
 
+        {# Filtres #}
+        <form method="GET" action="{{ path('app_jeux_liste') }}" class="bg-slate-900 border border-slate-800 rounded-xl p-5 mb-8">
+            {# On garde le terme de recherche si présent, pour qu'il ne se perde pas quand on filtre #}
+            {% if query %}
+                <input type="hidden" name="query" value="{{ query }}">
+            {% endif %}
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 items-end">
+
+                <div>
+                    <label class="block text-xs text-slate-400 mb-1">Catégorie</label>
+                    <select name="categorie" class="w-full bg-slate-800 border border-slate-700 text-sm text-white rounded-lg px-3 py-2 focus:outline-none focus:border-cyan-500">
+                        <option value="">Toutes</option>
+                        {% for cat in categories %}
+                            <option value="{{ cat.slug }}" {{ app.request.query.get('categorie') == cat.slug ? 'selected' : '' }}>
+                                {{ cat.nom }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-xs text-slate-400 mb-1">Prix min (€)</label>
+                    <input type="number" name="prix_min" min="0" step="1"
+                           value="{{ app.request.query.get('prix_min') }}"
+                           class="w-full bg-slate-800 border border-slate-700 text-sm text-white rounded-lg px-3 py-2 focus:outline-none focus:border-cyan-500">
+                </div>
+
+                <div>
+                    <label class="block text-xs text-slate-400 mb-1">Prix max (€)</label>
+                    <input type="number" name="prix_max" min="0" step="1"
+                           value="{{ app.request.query.get('prix_max') }}"
+                           class="w-full bg-slate-800 border border-slate-700 text-sm text-white rounded-lg px-3 py-2 focus:outline-none focus:border-cyan-500">
+                </div>
+
+                <div>
+                    <label class="block text-xs text-slate-400 mb-1">PEGI</label>
+                    <select name="pegi" class="w-full bg-slate-800 border border-slate-700 text-sm text-white rounded-lg px-3 py-2 focus:outline-none focus:border-cyan-500">
+                        <option value="">Tous</option>
+                        {% for pegi in pegis %}
+                            <option value="{{ pegi.value }}" {{ app.request.query.get('pegi') == pegi.value ? 'selected' : '' }}>
+                                PEGI {{ pegi.value }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="flex gap-2">
+                    <button type="submit" class="flex-1 bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-semibold text-sm py-2 px-4 rounded-lg transition">
+                        Filtrer
+                    </button>
+                    <a href="{{ path('app_jeux_liste') }}" class="flex items-center justify-center border border-slate-700 hover:border-slate-500 text-slate-300 hover:text-white text-sm py-2 px-4 rounded-lg transition">
+                        Réinitialiser
+                    </a>
+                </div>
+
+            </div>
+        </form>
+
+        {# Titre résultats #}
+        {% if query %}
+            <h1 class="text-2xl font-bold text-white mb-6">Résultats pour "{{ query }}"</h1>
+        {% else %}
+            <h1 class="text-2xl font-bold text-white mb-6">Liste des jeux</h1>
+        {% endif %}
+
+        {# Grille de jeux #}
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {% for jeu in jeux %}
                 <article class="group bg-slate-900 border border-slate-800 rounded-xl overflow-hidden hover:border-slate-700 transition">
@@ -40,7 +108,7 @@
                                     </a>
                                 {% endfor %}
                             {% endif %}
-                            <span class="px-2 py-0.5 text-xs rounded bg-slate-800 text-slate-300">{{ jeu.plateforme }}</span>
+                            <span class="px-2 py-0.5 text-xs rounded bg-slate-800 text-slate-300">{{ jeu.plateforme.value }}</span>
                             <span class="px-2 py-0.5 text-xs rounded bg-slate-800 text-slate-300">{{ jeu.etat.value }}</span>
                             {% if jeu.pegi %}
                                 <span class="px-2 py-0.5 text-xs rounded bg-slate-800 text-slate-300">PEGI {{ jeu.pegi.value }}</span>
@@ -57,24 +125,13 @@
                             </a>
                             <a href="{{ path('app_jeu', {'slug': jeu.slug, 'id': jeu.id}) }}" class="text-sm font-medium text-cyan-400 hover:text-cyan-300 transition">Voir →</a>
                         </div>
-                        {# Actions #}
-                        <div class="flex flex-col sm:flex-row gap-3 mt-3">
-                            <a href="#" class="flex-1 text-center bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-semibold py-3 px-6 rounded-lg transition">
-                                Ajouter au panier
-                            </a>
-                            <a href="#" class="flex items-center justify-center gap-2 border border-slate-700 hover:border-slate-500 text-slate-300 hover:text-white font-medium py-3 px-6 rounded-lg transition">
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z" />
-                                </svg>
-                                Wishlist
-                            </a>
-                        </div>
                     </div>
 
                 </article>
             {% else %}
-                <p class="col-span-full text-slate-400">Aucun jeu trouvé dans cette catégorie.</p>
+                <p class="col-span-full text-slate-400">Aucun jeu ne correspond à ces critères.</p>
             {% endfor %}
         </div>
+
     </div>
 {% endblock %}
