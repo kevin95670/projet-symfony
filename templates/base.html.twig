@@ -39,7 +39,7 @@
                 <div class="hidden md:flex items-center gap-6">
                     <a href="{{ path('app_jeux_liste') }}" class="text-slate-300 hover:text-white transition">Acheter un jeu</a>
                     <a href="{{ app.user ? path('app_jeu_vendre') : path('app_login') }}" class="text-slate-300 hover:text-white transition">Vendre un jeu</a>
-                    <a href="#" class="text-slate-300 hover:text-white transition">Ma liste de souhaits</a>
+                    <a href="{{ app.user ? path('app_wishlist') : path('app_login') }}" class="text-slate-300 hover:text-white transition">Ma liste de souhaits</a>
                 </div>
 
                 {# Icônes à droite #}
@@ -82,7 +82,7 @@
 
                                     <a href="{{ path('app_profil') }}" class="block px-4 py-2 text-sm text-slate-300 hover:bg-slate-700 hover:text-white transition">Mon profil</a>
                                     <a href="#" class="block px-4 py-2 text-sm text-slate-300 hover:bg-slate-700 hover:text-white transition">Mes ventes</a>
-                                    <a href="#" class="block px-4 py-2 text-sm text-slate-300 hover:bg-slate-700 hover:text-white transition">Ma liste de souhaits</a>
+                                    <a href="{{path('app_wishlist')}}" class="block px-4 py-2 text-sm text-slate-300 hover:bg-slate-700 hover:text-white transition">Ma liste de souhaits</a>
 
                                     <div class="border-t border-slate-700 mt-2 pt-2">
                                         <a href="{{ path('app_logout') }}" class="block px-4 py-2 text-sm text-red-400 hover:bg-slate-700 transition">Se déconnecter</a>
@@ -118,9 +118,9 @@
                             </div>
                         </form>
 
-                        <a href="#" class="block text-slate-300 hover:text-white py-2">Acheter un jeu</a>
-                        <a href="#" class="block text-slate-300 hover:text-white py-2">Vendre un jeu</a>
-                        <a href="#" class="block text-slate-300 hover:text-white py-2">Ma liste de souhaits</a>
+                        <a href="{{ path('app_jeux_liste') }}" class="block text-slate-300 hover:text-white py-2">Acheter un jeu</a>
+                        <a href="{{ app.user ? path('app_jeu_vendre') : path('app_login') }}" class="block text-slate-300 hover:text-white py-2">Vendre un jeu</a>
+                        <a href="{{ app.user ? path('app_wishlist') : path('app_login') }}" class="block text-slate-300 hover:text-white py-2">Ma liste de souhaits</a>
                     </div>
                 </div>
 

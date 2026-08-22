@@ -4,10 +4,12 @@ namespace App\Controller;
 
 use App\Repository\JeuRepository;
 use App\Repository\CategorieRepository;
+use App\Repository\WishlistItemRepository;
 use App\Enum\Pegi;
 use Symfony\Component\HttpFoundation\Request;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Entity\Jeu;
+use App\Entity\WishlistItem;
 use App\Form\JeuForm;
 use Symfony\Component\String\Slugger\AsciiSlugger;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
@@ -66,6 +68,26 @@ final class JeuController extends AbstractController
             'controller_name' => 'JeuController',
             'jeu' => $jeu,
         ]);
+    }
+
+    #[Route('/jeu/{id}/wishlist', name: 'app_jeu_wishlist_toggle')]
+    #[IsGranted('ROLE_USER')]
+    public function toggleWishlist(Jeu $jeu, Request $request, WishlistItemRepository $wishlistRepository, EntityManagerInterface $em): Response
+    {
+        /** @var \App\Entity\User|null $user */
+        $user = $this->getUser();
+
+        $existant = $wishlistRepository->findOneByUserAndJeu($user, $jeu);
+
+        if ($existant) {
+            $wishlistRepository->deleteFromWishlist($user->getId(), $jeu->getId());
+            $this->addFlash('success', 'Retiré de ta wishlist.');
+        } else {
+            $wishlistRepository->addToWishlist($user->getId(), $jeu->getId());
+            $this->addFlash('success', 'Ajouté à ta wishlist.');
+        }
+
+        return $this->redirect($request->headers->get('referer') ?? $this->generateUrl('app_home'));
     }
 
     #[Route('/jeu/vendre', name: 'app_jeu_vendre')]

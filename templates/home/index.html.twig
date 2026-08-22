@@ -125,10 +125,25 @@
                         <a href="#" class="flex-1 text-center bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-semibold py-3 px-6 rounded-lg transition">
                             Ajouter au panier
                         </a>
-                        <a href="#" class="flex items-center justify-center gap-2 border border-slate-700 hover:border-slate-500 text-slate-300 hover:text-white font-medium py-3 px-6 rounded-lg transition">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z" />
-                            </svg>
+                        {% set in_wishlist = app.user and vente.id in wishlistItemsIds %}
+
+                        <a href="{{ app.user ? path('app_jeu_wishlist_toggle', {'id': vente.id}) : path('app_login') }}"
+                        class="flex items-center justify-center gap-2 border font-medium py-3 px-6 rounded-lg transition
+                                {% if in_wishlist %}
+                                    border-cyan-500 bg-cyan-500/10 text-cyan-300 hover:bg-cyan-500/20
+                                {% else %}
+                                    border-slate-700 hover:border-slate-500 text-slate-300 hover:text-white
+                                {% endif %}">
+
+                            {% if in_wishlist %}
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5">
+                                    <path d="M11.645 20.91a.75.75 0 0 0 .71 0c.058-.03.116-.061.174-.093 1.735-.977 6.716-4.5 8.596-8.516 1.144-2.443.986-5.36-1.036-7.383a5.937 5.937 0 0 0-8.34-.087 5.937 5.937 0 0 0-8.34.087C1.4 6.94 1.24 9.858 2.384 12.301c1.88 4.016 6.86 7.539 8.596 8.516.058.032.116.063.174.093Z" />
+                                </svg>
+                            {% else %}
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z" />
+                                </svg>
+                            {% endif %}
                             Wishlist
                         </a>
                     </div>
@@ -203,10 +218,25 @@
                         <a href="#" class="flex-1 text-center bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-semibold py-3 px-6 rounded-lg transition">
                             Ajouter au panier
                         </a>
-                        <a href="#" class="flex items-center justify-center gap-2 border border-slate-700 hover:border-slate-500 text-slate-300 hover:text-white font-medium py-3 px-6 rounded-lg transition">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z" />
-                            </svg>
+                        {% set in_wishlist = app.user and jeu.id in wishlistItemsIds %}
+
+                        <a href="{{ app.user ? path('app_jeu_wishlist_toggle', {'id': jeu.id}) : path('app_login') }}"
+                        class="flex items-center justify-center gap-2 border font-medium py-3 px-6 rounded-lg transition
+                                {% if in_wishlist %}
+                                    border-cyan-500 bg-cyan-500/10 text-cyan-300 hover:bg-cyan-500/20
+                                {% else %}
+                                    border-slate-700 hover:border-slate-500 text-slate-300 hover:text-white
+                                {% endif %}">
+
+                            {% if in_wishlist %}
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5">
+                                    <path d="M11.645 20.91a.75.75 0 0 0 .71 0c.058-.03.116-.061.174-.093 1.735-.977 6.716-4.5 8.596-8.516 1.144-2.443.986-5.36-1.036-7.383a5.937 5.937 0 0 0-8.34-.087 5.937 5.937 0 0 0-8.34.087C1.4 6.94 1.24 9.858 2.384 12.301c1.88 4.016 6.86 7.539 8.596 8.516.058.032.116.063.174.093Z" />
+                                </svg>
+                            {% else %}
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z" />
+                                </svg>
+                            {% endif %}
                             Wishlist
                         </a>
                     </div>

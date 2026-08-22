@@ -76,11 +76,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(targetEntity: Avis::class, mappedBy: 'auteur')]
     private Collection $avis;
 
+    /**
+     * @var Collection<int, WishlistItem>
+     */
+    #[ORM\OneToMany(targetEntity: WishlistItem::class, mappedBy: 'user')]
+    private Collection $wishlistItems;
+
     public function __construct()
     {
         $this->jeux = new ArrayCollection();
         $this->commandes = new ArrayCollection();
         $this->avis = new ArrayCollection();
+        $this->wishlistItems = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -337,6 +344,36 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             // set the owning side to null (unless already changed)
             if ($avi->getAuteur() === $this) {
                 $avi->setAuteur(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, WishlistItem>
+     */
+    public function getWishlistItems(): Collection
+    {
+        return $this->wishlistItems;
+    }
+
+    public function addWishlistItem(WishlistItem $wishlistItem): static
+    {
+        if (!$this->wishlistItems->contains($wishlistItem)) {
+            $this->wishlistItems->add($wishlistItem);
+            $wishlistItem->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeWishlistItem(WishlistItem $wishlistItem): static
+    {
+        if ($this->wishlistItems->removeElement($wishlistItem)) {
+            // set the owning side to null (unless already changed)
+            if ($wishlistItem->getUser() === $this) {
+                $wishlistItem->setUser(null);
             }
         }
 

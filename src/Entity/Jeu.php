@@ -72,11 +72,18 @@ class Jeu
     #[ORM\Column(length: 255)]
     private ?string $slug = null;
 
+    /**
+     * @var Collection<int, WishlistItem>
+     */
+    #[ORM\OneToMany(targetEntity: WishlistItem::class, mappedBy: 'jeu')]
+    private Collection $wishlistItems;
+
     public function __construct()
     {
         $this->categories = new ArrayCollection();
         $this->panierItems = new ArrayCollection();
         $this->commandeLignes = new ArrayCollection();
+        $this->wishlistItems = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -299,6 +306,36 @@ class Jeu
     public function setSlug(string $slug): static
     {
         $this->slug = $slug;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, WishlistItem>
+     */
+    public function getWishlistItems(): Collection
+    {
+        return $this->wishlistItems;
+    }
+
+    public function addWishlistItem(WishlistItem $wishlistItem): static
+    {
+        if (!$this->wishlistItems->contains($wishlistItem)) {
+            $this->wishlistItems->add($wishlistItem);
+            $wishlistItem->setJeu($this);
+        }
+
+        return $this;
+    }
+
+    public function removeWishlistItem(WishlistItem $wishlistItem): static
+    {
+        if ($this->wishlistItems->removeElement($wishlistItem)) {
+            // set the owning side to null (unless already changed)
+            if ($wishlistItem->getJeu() === $this) {
+                $wishlistItem->setJeu(null);
+            }
+        }
 
         return $this;
     }
