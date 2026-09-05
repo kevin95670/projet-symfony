@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Confirmation de commande</title>
+</head>
+<body style="margin: 0; padding: 0; background-color: #0f172a; font-family: Arial, Helvetica, sans-serif;">
+
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color: #0f172a; padding: 40px 0;">
+        <tr>
+            <td align="center">
+
+                <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="background-color: #1e293b; border-radius: 12px; overflow: hidden; border: 1px solid #334155;">
+
+                    {# Header #}
+                    <tr>
+                        <td style="background-color: #06b6d4; padding: 32px 40px; text-align: center;">
+                            <h1 style="margin: 0; font-size: 22px; color: #0f172a; font-weight: bold;">
+                                Merci pour votre commande !
+                            </h1>
+                        </td>
+                    </tr>
+
+                    {# Intro #}
+                    <tr>
+                        <td style="padding: 32px 40px 16px;">
+                            <p style="margin: 0 0 8px; font-size: 16px; color: #e2e8f0;">
+                                Bonjour {{ user.pseudo ?? user.email }},
+                            </p>
+                            <p style="margin: 0; font-size: 14px; color: #94a3b8; line-height: 1.6;">
+                                Nous vous confirmons la bonne réception de votre commande
+                                {% if commande.numero is defined %}n°{{ commande.numero }}{% endif %}
+                                {% if commande.dateCommande is defined %}
+                                    passée le {{ commande.dateCommande|date('d/m/Y à H:i') }}
+                                {% endif %}.
+                                Voici le récapitulatif de vos articles.
+                            </p>
+                        </td>
+                    </tr>
+
+                    {# Tableau des articles #}
+                    <tr>
+                        <td style="padding: 16px 40px;">
+                            <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+                                <thead>
+                                    <tr>
+                                        <td style="padding: 8px 0; border-bottom: 1px solid #334155; font-size: 12px; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px;">
+                                            Jeu
+                                        </td>
+                                        <td style="padding: 8px 0; border-bottom: 1px solid #334155; font-size: 12px; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; text-align: center;">
+                                            Qté
+                                        </td>
+                                        <td style="padding: 8px 0; border-bottom: 1px solid #334155; font-size: 12px; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; text-align: right;">
+                                            Prix
+                                        </td>
+                                        <td style="padding: 8px 0; border-bottom: 1px solid #334155; font-size: 12px; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; text-align: right;">
+                                            Total
+                                        </td>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% set total_general = 0 %}
+                                    {% for item in commande.commandeLignes %}
+                                        {% set sous_total = item.prixUnitaire * item.quantite %}
+                                        {% set total_general = total_general + sous_total %}
+                                        <tr>
+                                            <td style="padding: 14px 0; border-bottom: 1px solid #293548; font-size: 14px; color: #e2e8f0;">
+                                                {{ item.jeu.titre }}
+                                            </td>
+                                            <td style="padding: 14px 0; border-bottom: 1px solid #293548; font-size: 14px; color: #94a3b8; text-align: center;">
+                                                {{ item.quantite }}
+                                            </td>
+                                            <td style="padding: 14px 0; border-bottom: 1px solid #293548; font-size: 14px; color: #94a3b8; text-align: right;">
+                                                {{ item.prixUnitaire|number_format(2, ',', ' ') }} €
+                                            </td>
+                                            <td style="padding: 14px 0; border-bottom: 1px solid #293548; font-size: 14px; color: #e2e8f0; text-align: right; font-weight: bold;">
+                                                {{ sous_total|number_format(2, ',', ' ') }} €
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </td>
+                    </tr>
+
+                    {# Total #}
+                    <tr>
+                        <td style="padding: 8px 40px 32px;">
+                            <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+                                <tr>
+                                    <td style="padding-top: 16px; font-size: 16px; color: #ffffff; font-weight: bold; text-align: right;">
+                                        Total&nbsp;:
+                                        <span style="color: #22d3ee;">
+                                            {{ total_general|number_format(2, ',', ' ') }} €
+                                        </span>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+
+                    {# Séparateur #}
+                    <tr>
+                        <td style="padding: 0 40px;">
+                            <div style="border-top: 1px solid #334155;"></div>
+                        </td>
+                    </tr>
+
+                    {# Message de fin #}
+                    <tr>
+                        <td style="padding: 24px 40px 32px;">
+                            <p style="margin: 0 0 16px; font-size: 14px; color: #94a3b8; line-height: 1.6;">
+                                Vous pouvez retrouver le détail de cette commande à tout moment depuis votre espace personnel.
+                            </p>
+
+                            <table role="presentation" cellpadding="0" cellspacing="0">
+                                <tr>
+                                    <td style="border-radius: 8px; background-color: #06b6d4;">
+                                        <a href="#"
+                                           style="display: inline-block; padding: 12px 28px; font-size: 14px; font-weight: bold; color: #0f172a; text-decoration: none;">
+                                            Voir mes commandes
+                                        </a>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+
+                    {# Footer #}
+                    <tr>
+                        <td style="background-color: #0f172a; padding: 24px 40px; text-align: center; border-top: 1px solid #334155;">
+                            <p style="margin: 0; font-size: 12px; color: #64748b;">
+                                Merci de votre confiance — l'équipe du site
+                            </p>
+                        </td>
+                    </tr>
+
+                </table>
+
+            </td>
+        </tr>
+    </table>
+
+</body>
+</html>

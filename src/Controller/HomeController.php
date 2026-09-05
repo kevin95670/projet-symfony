@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Controller;
-
+use App\Service\CartMerger;
 use App\Repository\JeuRepository;
 use App\Repository\UserRepository;
 use App\Repository\CategorieRepository;
@@ -13,7 +13,7 @@ use Symfony\Component\Routing\Attribute\Route;
 final class HomeController extends AbstractController
 {
     #[Route('/', name: 'app_home')]
-    public function index(JeuRepository $jeuRepository, WishlistItemRepository $wishlistItemRepository, UserRepository $userRepository, CategorieRepository $categorieRepository): Response
+    public function index(JeuRepository $jeuRepository,CartMerger $cartMerger, WishlistItemRepository $wishlistItemRepository, UserRepository $userRepository, CategorieRepository $categorieRepository): Response
     {
 
         $last_ventes = $jeuRepository->getLastJeux(10,true);
@@ -23,12 +23,15 @@ final class HomeController extends AbstractController
         $categories = $categorieRepository->findAll();
         $jeux_petits_budget = $jeuRepository->findPetitsPrix();
 
+        /** @var \App\Entity\User|null $user */
         $user = $this->getUser();
 
         $wishlistItemsIds = [];
         if ($user) {
             $wishlistItemsIds = $wishlistItemRepository->findJeuIdsByUser($user);
         }
+
+        $panierItemsIds = $cartMerger->getPanierItemsIds($user);
 
         return $this->render('home/index.html.twig', [
             'controller_name' => 'HomeController',
@@ -39,6 +42,7 @@ final class HomeController extends AbstractController
             'categories' => $categories,
             'jeux_petits_budget' => $jeux_petits_budget,
             'wishlistItemsIds' => $wishlistItemsIds,
+            'panierItemsIds' => $panierItemsIds,
         ]);
     }
 }
