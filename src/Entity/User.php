@@ -71,10 +71,16 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?\DateTime $dateCreation = null;
 
     /**
-     * @var Collection<int, Avis>
+     * @var Collection<int, Avis> Avis que cet utilisateur a écrits
      */
     #[ORM\OneToMany(targetEntity: Avis::class, mappedBy: 'auteur')]
-    private Collection $avis;
+    private Collection $avisEnvoyes;
+
+    /**
+     * @var Collection<int, Avis>
+     */
+    #[ORM\OneToMany(targetEntity: Avis::class, mappedBy: 'vendeur')]
+    private Collection $avisRecus;
 
     /**
      * @var Collection<int, WishlistItem>
@@ -86,7 +92,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         $this->jeux = new ArrayCollection();
         $this->commandes = new ArrayCollection();
-        $this->avis = new ArrayCollection();
+        $this->avisEnvoyes = new ArrayCollection();
+        $this->avisRecus = new ArrayCollection();
         $this->wishlistItems = new ArrayCollection();
     }
 
@@ -323,27 +330,57 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * @return Collection<int, Avis>
      */
-    public function getAvis(): Collection
+    public function getAvisEnvoyes(): Collection
     {
-        return $this->avis;
+        return $this->avisEnvoyes;
     }
 
-    public function addAvi(Avis $avi): static
+    /**
+     * @return Collection<int, Avis>
+     */
+    public function getAvisRecus(): Collection
     {
-        if (!$this->avis->contains($avi)) {
-            $this->avis->add($avi);
-            $avi->setAuteur($this);
+        return $this->avisRecus;
+    }
+
+    public function addAvisEnvoye(Avis $avisEnvoye): static
+    {
+        if (!$this->avisEnvoyes->contains($avisEnvoye)) {
+            $this->avisEnvoyes->add($avisEnvoye);
+            $avisEnvoye->setAuteur($this);
         }
 
         return $this;
     }
 
-    public function removeAvi(Avis $avi): static
+    public function removeAvisEnvoye(Avis $avisEnvoye): static
     {
-        if ($this->avis->removeElement($avi)) {
+        if ($this->avisEnvoyes->removeElement($avisEnvoye)) {
             // set the owning side to null (unless already changed)
-            if ($avi->getAuteur() === $this) {
-                $avi->setAuteur(null);
+            if ($avisEnvoye->getAuteur() === $this) {
+                $avisEnvoye->setAuteur(null);
+            }
+        }
+
+        return $this;
+    }
+
+    public function addAvisRecu(Avis $avisRecu): static
+    {
+        if (!$this->avisRecus->contains($avisRecu)) {
+            $this->avisRecus->add($avisRecu);
+            $avisRecu->setVendeur($this);
+        }
+
+        return $this;
+    }
+
+    public function removeAvisRecu(Avis $avisRecu): static
+    {
+        if ($this->avisRecus->removeElement($avisRecu)) {
+            // set the owning side to null (unless already changed)
+            if ($avisRecu->getVendeur() === $this) {
+                $avisRecu->setVendeur(null);
             }
         }
 

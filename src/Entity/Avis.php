@@ -14,11 +14,11 @@ class Avis
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\ManyToOne(inversedBy: 'avis')]
+    #[ORM\ManyToOne(inversedBy: 'avisEnvoyes')]
     #[ORM\JoinColumn(nullable: false)]
     private ?User $auteur = null;
 
-    #[ORM\ManyToOne(inversedBy: 'avis')]
+    #[ORM\ManyToOne(inversedBy: 'avisRecus')]
     #[ORM\JoinColumn(nullable: false)]
     private ?User $vendeur = null;
 

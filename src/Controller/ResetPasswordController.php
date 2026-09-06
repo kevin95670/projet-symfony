@@ -156,17 +156,21 @@ class ResetPasswordController extends AbstractController
             return $this->redirectToRoute('app_check_email');
         }
 
-        $email = (new TemplatedEmail())
-            ->from(new Address('kevinleonard.info@gmail.com', 'Kevin'))
-            ->to((string) $user->getEmail())
-            ->subject('Votre demande de réinitialisation du mot de passe')
-            ->htmlTemplate('reset_password/email.html.twig')
-            ->context([
-                'resetToken' => $resetToken,
-            ])
-        ;
+        try{
+            $email = (new TemplatedEmail())
+                ->from(new Address('kevinleonard.info@gmail.com', 'Kevin'))
+                ->to((string) $user->getEmail())
+                ->subject('Votre demande de réinitialisation du mot de passe')
+                ->htmlTemplate('reset_password/email.html.twig')
+                ->context([
+                    'resetToken' => $resetToken,
+                ])
+            ;
 
-        $mailer->send($email);
+            $mailer->send($email);
+        } catch (\Exception $e) {
+            $this->addFlash('error', 'Erreur lors de l\'envoi de l\'email de réinitialisation : ' . $e->getMessage());
+        }
 
         // Store the token object in session for retrieval in check-email route.
         $this->setTokenObjectInSession($resetToken);

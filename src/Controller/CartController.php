@@ -142,18 +142,22 @@ final class CartController extends AbstractController
         }
 
         $commande = $cartRepository->checkout($user->getPanier());
-        $email = (new TemplatedEmail())
-        ->from(new Address('kevinleonard.info@gmail.com', 'Kevin'))
-        ->to((string) $user->getEmail())
-        ->subject('Merci pour votre commande !')
-        ->htmlTemplate('commande/commande.html.twig')
-        ->context([
-            'user' => $user,
-            'commande' => $commande
-        ])
-        ;
+        try {
+            $email = (new TemplatedEmail())
+            ->from(new Address('kevinleonard.info@gmail.com', 'Kevin'))
+            ->to((string) $user->getEmail())
+            ->subject('Merci pour votre commande !')
+            ->htmlTemplate('commande/commande.html.twig')
+            ->context([
+                'user' => $user,
+                'commande' => $commande
+            ])
+            ;
 
-        $mailer->send($email);
+            $mailer->send($email);
+        } catch (\Exception $e) {
+            $this->addFlash('error', 'Erreur lors de l\'envoi de l\'email de confirmation : ' . $e->getMessage());
+        }
 
 
         return $this->redirectToRoute('app_commande_confirmation', ['id' => $commande->getId()]);

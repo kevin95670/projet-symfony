@@ -36,6 +36,7 @@ class RegistrationController extends AbstractController
             $entityManager->flush();
 
             // do anything else you need here, like send an email
+            try {
             $email = (new TemplatedEmail())
             ->from(new Address('kevinleonard.info@gmail.com', 'Kevin'))
             ->to((string) $user->getEmail())
@@ -47,6 +48,9 @@ class RegistrationController extends AbstractController
             ;
 
             $mailer->send($email);
+            } catch (\Exception $e) {
+             $this->addFlash('error', 'Erreur lors de l\'envoi de l\'email de confirmation : ' . $e->getMessage());
+            }
 
             return $security->login($user, 'form_login', 'main');
         }
