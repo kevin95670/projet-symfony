@@ -27,10 +27,14 @@ ENV COMPOSER_ALLOW_SUPERUSER=1
 
 WORKDIR /var/www/html
 COPY . .
+
 RUN composer install --no-dev --optimize-autoloader \
     && composer dump-autoload --no-dev --optimize
 
-RUN mkdir -p /var/www/html/var && chown -R www-data:www-data /var/www/html/var
+# Compiler les assets avec Symfony Asset Mapper
+RUN php bin/console asset-map:compile
+
+RUN mkdir -p /var/www/html/var && chown -R www-data:www-data /var/www/html/var /var/www/html/public
 
 COPY docker-entrypoint.sh /usr/local/bin/
 RUN chmod +x /usr/local/bin/docker-entrypoint.sh
