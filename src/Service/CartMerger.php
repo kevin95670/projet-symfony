@@ -47,4 +47,20 @@ class CartMerger
 
         return array_map('intval', array_keys($cart));
     }
+
+    public function getPanierItemsCount(?User $user): int
+    {
+        if ($user && $user->getPanier()) {
+            $count = 0;
+            foreach ($user->getPanier()->getPanierItems() as $item) {
+                $count += $item->getQuantite();
+            }
+            return $count;
+        }
+
+        $session = $this->requestStack->getSession();
+        $cart = $session->get('cart', []);
+
+        return array_sum($cart);
+    }
 }
