@@ -93,7 +93,7 @@
 
                                     <a href="{{ path('app_profil') }}" class="block px-4 py-2 text-sm text-slate-300 hover:bg-slate-700 hover:text-white transition">Mon profil</a>
                                     <a href="{{ path('app_commandes') }}" class="block px-4 py-2 text-sm text-slate-300 hover:bg-slate-700 hover:text-white transition">Mes commandes</a>
-                                    <a href="#" class="block px-4 py-2 text-sm text-slate-300 hover:bg-slate-700 hover:text-white transition">Mes ventes</a>
+                                    <a href="{{ path('app_ventes', {'vendeurId': app.user.id}) }}" class="block px-4 py-2 text-sm text-slate-300 hover:bg-slate-700 hover:text-white transition">Mes ventes</a>
                                     <a href="{{ path('app_wishlist') }}" class="block px-4 py-2 text-sm text-slate-300 hover:bg-slate-700 hover:text-white transition">Ma liste de souhaits</a>
 
                                     <div class="border-t border-slate-700 mt-2 pt-2">

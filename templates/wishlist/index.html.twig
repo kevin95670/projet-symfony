@@ -17,7 +17,10 @@
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                 {% for item in wishlistItems %}
                     {% set jeu = item.jeu %}
-                    <article class="group bg-slate-900 border border-slate-800 rounded-xl overflow-hidden hover:border-slate-700 transition">
+                    {% set isAvailable = jeu.statut.name == 'EN_VENTE' %}
+                    {% set isOwnJeu = app.user and jeu.vendeur.id == app.user.id %}
+                    
+                    <article class="group bg-slate-900 border border-slate-800 rounded-xl overflow-hidden hover:border-slate-700 transition {% if not isAvailable %}opacity-75{% endif %}">
 
                         <div class="relative aspect-4/3 bg-slate-800 overflow-hidden">
                             {% if jeu.image %}
@@ -28,6 +31,31 @@
                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 0 0 1.5-1.5V6a1.5 1.5 0 0 0-1.5-1.5H3.75A1.5 1.5 0 0 0 2.25 6v12a1.5 1.5 0 0 0 1.5 1.5Zm10.5-11.25h.008v.008h-.008V8.25Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z" />
                                     </svg>
+                                </div>
+                            {% endif %}
+
+                            <!-- Badge "Votre annonce" -->
+                            {% if isOwnJeu %}
+                                <div class="absolute top-3 left-3 bg-blue-500/90 text-white rounded-lg px-3 py-1.5 flex items-center gap-1.5">
+                                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                        <path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5.951-1.488 5.951 1.488a1 1 0 001.169-1.409l-7-14z" />
+                                    </svg>
+                                    <span class="text-xs font-medium">Votre annonce</span>
+                                </div>
+                            {% endif %}
+
+                            <!-- Badge statut si non disponible -->
+                            {% if not isAvailable %}
+                                <div class="absolute inset-0 bg-black/60 flex items-center justify-center">
+                                    <div class="text-center">
+                                        <p class="text-white font-bold text-lg">
+                                            {% if jeu.statut.name == 'VENDU' %}
+                                                Vendu
+                                            {% else %}
+                                                Retiré de la vente
+                                            {% endif %}
+                                        </p>
+                                    </div>
                                 </div>
                             {% endif %}
 
@@ -74,9 +102,30 @@
                                 <a href="{{ path('app_jeu', {'slug': jeu.slug, 'id': jeu.id}) }}" class="text-sm font-medium text-cyan-400 hover:text-cyan-300 transition">Voir →</a>
                             </div>
 
-                            <a href="#" class="flex items-center justify-center w-full bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-semibold py-3 px-6 rounded-lg transition">
-                                Ajouter au panier
-                            </a>
+                            <!-- Bouton Ajouter au panier ou État non disponible ou Votre annonce -->
+                            {% if isOwnJeu %}
+                                {# C'est son propre jeu #}
+                                <button disabled class="flex items-center justify-center w-full bg-gray-600 text-gray-300 font-semibold py-3 px-6 rounded-lg cursor-not-allowed opacity-60">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 mr-2">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                    C'est votre annonce
+                                </button>
+                            {% elseif isAvailable %}
+                                {# Disponible et pas son jeu #}
+                                <a href="#" class="flex items-center justify-center w-full bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-semibold py-3 px-6 rounded-lg transition">
+                                    Ajouter au panier
+                                </a>
+                            {% else %}
+                                {# Pas disponible #}
+                                <button disabled class="flex items-center justify-center w-full bg-gray-400 text-gray-700 font-semibold py-3 px-6 rounded-lg cursor-not-allowed opacity-60">
+                                    {% if jeu.statut.name == 'VENDU' %}
+                                        Produit vendu
+                                    {% else %}
+                                        Produit retiré
+                                    {% endif %}
+                                </button>
+                            {% endif %}
                         </div>
 
                     </article>

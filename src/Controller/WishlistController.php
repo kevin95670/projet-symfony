@@ -15,11 +15,13 @@ final class WishlistController extends AbstractController
     public function index(WishlistItemRepository $wishlistItemRepository): Response
     {
 
-        $wishlistItems = $wishlistItemRepository->getWishlistItemsByUserId($this->getUser()->getId());
+        /** @var \App\Entity\User|null $user */
+        $user = $this->getUser();
+
+        $wishlistItems = $wishlistItemRepository->getWishlistItemsByUserId($user->getId());
         
 
         return $this->render('wishlist/index.html.twig', [
-            'controller_name' => 'WishlistController',
             'wishlistItems' => $wishlistItems,
         ]);
     }

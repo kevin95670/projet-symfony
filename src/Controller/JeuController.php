@@ -11,6 +11,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use App\Entity\Jeu;
 use App\Entity\WishlistItem;
 use App\Form\JeuForm;
+use App\Form\JeuEditType;
 use Symfony\Component\String\Slugger\AsciiSlugger;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -70,6 +71,35 @@ final class JeuController extends AbstractController
         ]);
     }
 
+    #[Route('/jeu/{slug}/{id}/editer', name: 'app_jeu_modifier')]
+    #[IsGranted('ROLE_USER')]
+    public function modifierJeu(Request $request, EntityManagerInterface $em, Jeu $jeu): Response
+    {
+
+        /** @var \App\Entity\User|null $user */
+        $user = $this->getUser();
+
+        // Vérifier que c'est le propriétaire du jeu
+        if ($jeu->getVendeur() !== $user) {
+            throw $this->createAccessDeniedException('Vous ne pouvez pas modifier ce jeu.');
+        }
+
+        $form = $this->createForm(JeuEditType::class, $jeu);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $em->flush();
+
+            $this->addFlash('success', 'Jeu mis à jour avec succès.');
+            return $this->redirectToRoute('app_ventes', ['vendeurId' => $user->getId()]);
+        }
+
+        return $this->render('jeu/modify.html.twig', [
+            'form' => $form,
+            'jeu' => $jeu,
+        ]);
+    }
+
     #[Route('/jeu/{id}/wishlist', name: 'app_jeu_wishlist_toggle')]
     #[IsGranted('ROLE_USER')]
     public function toggleWishlist(Jeu $jeu, Request $request, WishlistItemRepository $wishlistRepository, EntityManagerInterface $em): Response
@@ -116,6 +146,47 @@ final class JeuController extends AbstractController
 
         return $this->render('jeu/vendre.html.twig', [
             'form' => $form,
+        ]);
+    }
+
+    #[Route('/jeu/{id}/delete', name: 'app_jeu_delete')]
+    #[IsGranted('ROLE_USER')]
+    public function delete_jeu(Jeu $jeu, Request $request, EntityManagerInterface $em): Response
+    {
+
+        /** @var \App\Entity\User|null $user */
+        $user = $this->getUser();
+
+        $vendeurId = $jeu->getVendeur()->getId();
+
+        if (!$user || $user->getId() !== $vendeurId) {
+            throw $this->createAccessDeniedException('Vous ne pouvez pas accéder aux ventes d\'un autre utilisateur.');
+        }
+
+        $em->remove($jeu);
+        $em->flush();
+
+        $this->addFlash('success', 'Le jeu a bien été supprimé.');
+
+        return $this->redirectToRoute('app_ventes', ['vendeurId' => $vendeurId]);
+    }
+
+    #[Route('/ventes/{vendeurId}', name: 'app_ventes')]
+    #[IsGranted('ROLE_USER')]
+    public function ventes(int $vendeurId, JeuRepository $jeuRepository): Response
+    {
+
+        /** @var \App\Entity\User|null $user */
+        $user = $this->getUser();
+
+        if (!$user || $user->getId() !== $vendeurId) {
+            throw $this->createAccessDeniedException('Vous ne pouvez pas accéder aux ventes d\'un autre utilisateur.');
+        }
+
+        $ventes = $jeuRepository->findAllVentes($vendeurId);
+
+        return $this->render('jeu/ventes.html.twig', [
+            'ventes' => $ventes,
         ]);
     }
 }

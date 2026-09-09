@@ -21,7 +21,7 @@ final class HomeController extends AbstractController
         $nb_membres =$userRepository->countUsers();
         $nb_categories = $categorieRepository->countCategories();
         $categories = $categorieRepository->findAll();
-        $jeux_petits_budget = $jeuRepository->findPetitsPrix();
+        $jeux_petits_budget = $jeuRepository->findPetitsPrix(15,true);
 
         /** @var \App\Entity\User|null $user */
         $user = $this->getUser();

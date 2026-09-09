@@ -96,18 +96,23 @@ class JeuRepository extends ServiceEntityRepository
         }
 
         //Prix de 15€ max
-        public function findPetitsPrix(int $valeurMax = 15): array
+        public function findPetitsPrix(int $valeurMax = 15, $only_disponible = false): array
         {
-            return $this->createQueryBuilder('j')
+            $qb = $this->createQueryBuilder('j')
                 ->leftJoin('j.categories', 'c')
                 ->addSelect('c')
                 ->leftJoin('j.vendeur', 'v')
                 ->addSelect('v')
                 ->andWhere('j.prix <= :prix')
                 ->setParameter('prix', $valeurMax)
-                ->setMaxResults(10)
-                ->getQuery()
-                ->getResult();
+                ->setMaxResults(10);
+
+            if ($only_disponible) {
+                $qb->andWhere('j.statut = :statut')
+                   ->setParameter('statut', 'disponible');
+            }
+
+            return $qb->getQuery()->getResult();
         }
 
         public function findAllByRecherche(array $criteres = []): array
@@ -154,6 +159,19 @@ class JeuRepository extends ServiceEntityRepository
                 ->addSelect('c')
                 ->leftJoin('j.vendeur', 'v')
                 ->addSelect('v')
+                ->getQuery()
+                ->getResult();
+        }
+
+        public function findAllVentes(int $vendeurId): array
+        {
+            return $this->createQueryBuilder('j')
+                ->leftJoin('j.categories', 'c')
+                ->addSelect('c')
+                ->leftJoin('j.vendeur', 'v')
+                ->addSelect('v')
+                ->andWhere('j.vendeur = :vendeur')
+                ->setParameter('vendeur', $vendeurId)
                 ->getQuery()
                 ->getResult();
         }

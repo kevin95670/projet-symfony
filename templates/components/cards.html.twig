@@ -1,0 +1,138 @@
+<article class="group bg-slate-900 border border-slate-800 rounded-xl overflow-hidden hover:border-slate-700 transition">
+
+    {# Image #}
+    <div class="relative aspect-4/3 bg-slate-800 overflow-hidden">
+        {% if jeu.image %}
+            <img src="{{ jeu.image }}" alt="{{ jeu.titre }}"
+                 class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
+        {% else %}
+            <div class="w-full h-full flex items-center justify-center text-slate-600 text-sm">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 0 0 1.5-1.5V6a1.5 1.5 0 0 0-1.5-1.5H3.75A1.5 1.5 0 0 0 2.25 6v12a1.5 1.5 0 0 0 1.5 1.5Zm10.5-11.25h.008v.008h-.008V8.25Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z" />
+                </svg>
+            </div>
+        {% endif %}
+
+        {# Badge "Votre annonce" #}
+        {% if app.user and jeu.vendeur.id == app.user.id %}
+            <div class="absolute top-3 left-3 bg-blue-500/90 text-white rounded-lg px-3 py-1.5 flex items-center gap-1.5">
+                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5.951-1.488 5.951 1.488a1 1 0 001.169-1.409l-7-14z" />
+                </svg>
+                <span class="text-xs font-medium">Votre annonce</span>
+            </div>
+        {% endif %}
+    </div>
+
+    <div class="p-5">
+        {# Titre et Prix #}
+        <div class="flex items-start justify-between gap-3 mb-2">
+            <h3 class="font-semibold text-white leading-snug">{{ jeu.titre }}</h3>
+            <span class="shrink-0 text-lg font-bold text-white">{{ jeu.prix }} €</span>
+        </div>
+
+        {# Description #}
+        <p class="text-sm text-slate-400 line-clamp-2 mb-4">{{ jeu.description }}</p>
+
+        {# Tags #}
+        <div class="flex flex-wrap gap-2 mb-4">
+            {% if jeu.categories %}
+                {% for categorie in jeu.categories %}
+                    <a href="{{ path('app_jeux_par_categorie', {'slug': categorie.slug}) }}"
+                       class="px-2 py-0.5 text-xs rounded bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 hover:bg-cyan-500/30 hover:text-cyan-200 transition font-medium">
+                        {{ categorie.nom }}
+                    </a>
+                {% endfor %}
+            {% endif %}
+            <span class="px-2 py-0.5 text-xs rounded bg-slate-800 text-slate-300">{{ jeu.plateforme.value }}</span>
+            <span class="px-2 py-0.5 text-xs rounded bg-slate-800 text-slate-300">{{ jeu.etat.value }}</span>
+            {% if jeu.pegi %}
+                <span class="px-2 py-0.5 text-xs rounded bg-slate-800 text-slate-300">PEGI {{ jeu.pegi.value }}</span>
+            {% endif %}
+        </div>
+
+        {# Vendeur et Voir #}
+        <div class="flex items-center justify-between pt-4 border-t border-slate-800">
+            <a href="{{ path('vue_vendeur', {'pseudo': jeu.vendeur.pseudo}) }}"
+               class="inline-flex items-center gap-1.5 text-sm text-slate-400 hover:text-cyan-300 transition underline decoration-slate-700 hover:decoration-cyan-400 underline-offset-2">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M17.982 18.725A7.488 7.488 0 0 0 12 15.75a7.488 7.488 0 0 0-5.982 2.975m11.963 0a9 9 0 1 0-11.963 0m11.963 0A8.966 8.966 0 0 1 12 21a8.966 8.966 0 0 1-5.982-2.275M15 9.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                </svg>
+                {{ jeu.vendeur.pseudo }}
+            </a>
+            <a href="{{ path('app_jeu', {'slug': jeu.slug, 'id': jeu.id}) }}" class="text-sm font-medium text-cyan-400 hover:text-cyan-300 transition">Voir →</a>
+        </div>
+
+        {# Actions #}
+        <div class="flex flex-col sm:flex-row gap-3 mt-3">
+            {% set in_panier = jeu.id in panierItemsIds %}
+            {% set isOwnJeu = app.user and jeu.vendeur.id == app.user.id %}
+
+            {% if isOwnJeu %}
+                {# Bouton désactivé pour son propre jeu #}
+                <button disabled class="flex-1 flex items-center justify-center gap-2 font-semibold py-3 px-6 rounded-lg bg-gray-600 text-gray-300 cursor-not-allowed opacity-60">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    C'est votre annonce
+                </button>
+            {% else %}
+                {# Bouton Ajouter au panier #}
+                <form action="{{ path('app_jeu_cart_toggle', {'id': jeu.id}) }}" method="post"
+                      class="flex-1 flex items-center justify-center gap-2 font-semibold py-3 px-6 rounded-lg transition
+                              {% if in_panier %}
+                                  bg-cyan-500/10 border border-cyan-500 text-cyan-300 hover:bg-cyan-500/20
+                              {% else %}
+                                  bg-cyan-500 hover:bg-cyan-400 text-slate-950
+                              {% endif %}">
+                    {% if in_panier %}
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5">
+                            <path fill-rule="evenodd" d="M2.25 2.25a.75.75 0 0 0 0 1.5h1.386c.17 0 .318.114.362.278l2.558 9.592a3.752 3.752 0 0 0-2.806 3.63c0 .414.336.75.75.75h15.75a.75.75 0 0 0 0-1.5H5.378A2.25 2.25 0 0 1 7.5 15h11.218a.75.75 0 0 0 .674-.421 60.358 60.358 0 0 0 2.96-7.228.75.75 0 0 0-.525-.965A60.864 60.864 0 0 0 5.68 4.509l-.232-.867A1.875 1.875 0 0 0 3.636 2.25H2.25ZM3.75 20.25a1.5 1.5 0 1 1 3 0 1.5 1.5 0 0 1-3 0ZM16.5 20.25a1.5 1.5 0 1 1 3 0 1.5 1.5 0 0 1-3 0Z" clip-rule="evenodd" />
+                        </svg>
+                        Retirer du panier
+                    {% else %}
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.087.836l.383 1.437M7.5 14.25a3 3 0 0 0-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 0 0-16.536-1.84M7.5 14.25 5.106 5.272M6 20.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Zm12.75 0a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z" />
+                        </svg>
+                        Ajouter au panier
+                    {% endif %}
+                </form>
+            {% endif %}
+
+            {% set in_wishlist = app.user and jeu.id in wishlistItemsIds %}
+
+            {% if app.user %}
+                <form action="{{ path('app_jeu_wishlist_toggle', {'id': jeu.id}) }}" method="post">
+                    <input type="hidden" name="_token" value="{{ csrf_token('toggle-wishlist-' ~ jeu.id) }}">
+                    <button type="submit"
+                            class="flex items-center justify-center gap-2 border font-medium py-3 px-6 rounded-lg transition
+                                    {% if in_wishlist %}
+                                        border-cyan-500 bg-cyan-500/10 text-cyan-300 hover:bg-cyan-500/20
+                                    {% else %}
+                                        border-slate-700 hover:border-slate-500 text-slate-300 hover:text-white
+                                    {% endif %}">
+                        {% if in_wishlist %}
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5">
+                                <path d="M11.645 20.91a.75.75 0 0 0 .71 0c.058-.03.116-.061.174-.093 1.735-.977 6.716-4.5 8.596-8.516 1.144-2.443.986-5.36-1.036-7.383a5.937 5.937 0 0 0-8.34-.087 5.937 5.937 0 0 0-8.34.087C1.4 6.94 1.24 9.858 2.384 12.301c1.88 4.016 6.86 7.539 8.596 8.516.058.032.116.063.174.093Z" />
+                            </svg>
+                        {% else %}
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z" />
+                            </svg>
+                        {% endif %}
+                        Wishlist
+                    </button>
+                </form>
+            {% else %}
+                <a href="{{ path('app_login') }}"
+                   class="flex items-center justify-center gap-2 border font-medium py-3 px-6 rounded-lg transition border-slate-700 hover:border-slate-500 text-slate-300 hover:text-white">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z" />
+                    </svg>
+                    Wishlist
+                </a>
+            {% endif %}
+        </div>
+    </div>
+
+</article>
