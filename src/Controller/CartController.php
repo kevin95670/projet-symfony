@@ -33,6 +33,7 @@ final class CartController extends AbstractController
 
             foreach ($user->getPanier()->getPanierItems() as $panierItem) {
                 $items[] = [
+                    'panierItem' => $panierItem,
                     'jeu' => $panierItem->getJeu(),
                     'quantity' => $panierItem->getQuantite(),
                 ];

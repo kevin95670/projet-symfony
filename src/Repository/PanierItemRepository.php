@@ -78,6 +78,7 @@ class PanierItemRepository extends ServiceEntityRepository
         $panierItem = new PanierItem();
         $panierItem->setPanier($entityManager->getReference('App\Entity\Panier', $panierId));
         $panierItem->setJeu($entityManager->getReference('App\Entity\Jeu', $jeuId));
+        $panierItem->setMiseAJour(new \DateTimeImmutable());
         $panierItem->setQuantite(1);
 
         $entityManager->persist($panierItem);

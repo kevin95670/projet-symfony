@@ -78,6 +78,9 @@ class Jeu
     #[ORM\OneToMany(targetEntity: WishlistItem::class, mappedBy: 'jeu')]
     private Collection $wishlistItems;
 
+    #[ORM\Column(nullable: true)]
+    private ?\DateTimeImmutable $mise_a_jour = null;
+
     public function __construct()
     {
         $this->categories = new ArrayCollection();
@@ -336,6 +339,18 @@ class Jeu
                 $wishlistItem->setJeu(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getMiseAJour(): ?\DateTimeImmutable
+    {
+        return $this->mise_a_jour;
+    }
+
+    public function setMiseAJour(?\DateTimeImmutable $mise_a_jour): static
+    {
+        $this->mise_a_jour = $mise_a_jour;
 
         return $this;
     }

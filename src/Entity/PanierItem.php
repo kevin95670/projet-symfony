@@ -24,6 +24,9 @@ class PanierItem
     #[ORM\JoinColumn(nullable: false)]
     private ?Panier $panier = null;
 
+    #[ORM\Column]
+    private ?\DateTimeImmutable $mise_a_jour = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -61,6 +64,18 @@ class PanierItem
     public function setPanier(?Panier $panier): static
     {
         $this->panier = $panier;
+
+        return $this;
+    }
+
+    public function getMiseAJour(): ?\DateTimeImmutable
+    {
+        return $this->mise_a_jour;
+    }
+
+    public function setMiseAJour(\DateTimeImmutable $mise_a_jour): static
+    {
+        $this->mise_a_jour = $mise_a_jour;
 
         return $this;
     }

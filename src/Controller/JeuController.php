@@ -90,6 +90,8 @@ final class JeuController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $em->flush();
 
+            $jeu->setMiseAJour(new \DateTimeImmutable());
+
             $this->addFlash('success', 'Jeu mis à jour avec succès.');
             return $this->redirectToRoute('app_ventes', ['vendeurId' => $user->getId()]);
         }
