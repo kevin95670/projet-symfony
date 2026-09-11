@@ -6,6 +6,7 @@ use App\Repository\PanierItemRepository;
 use App\Repository\PanierRepository;
 use App\Entity\Jeu;
 use App\Repository\JeuRepository;
+use App\Repository\PromoCodeRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -21,14 +22,20 @@ final class CartController extends AbstractController
     public function __construct(private CartMerger $cartMerger) {}
 
     #[Route('/cart', name: 'app_cart')]
-    public function index(Request $request, JeuRepository $jeuRepository): Response
+    public function index(Request $request, JeuRepository $jeuRepository, PromoCodeRepository $promoRepository): Response
     {
-
         /** @var \App\Entity\User|null $user */
         $user = $this->getUser();
 
-        if ($user) {
+        $items = [];
+        $promoApplied = false;
+        $promoCode = null;
+        $discount = 0;
 
+        // Récupère le code promo de la session
+        $appliedPromoCode = $request->getSession()->get('promo_code');
+
+        if ($user) {
             $this->cartMerger->mergeSessionCartIfNeeded($user);
 
             foreach ($user->getPanier()->getPanierItems() as $panierItem) {
@@ -42,8 +49,6 @@ final class CartController extends AbstractController
         } else {
             $cart = $request->getSession()->get('cart', []);
 
-            //dd($cart); // <-- ajoute ça ici
-
             foreach ($cart as $jeuId => $quantity) {
                 $jeu = $jeuRepository->find($jeuId);
                 if ($jeu) {
@@ -56,16 +61,67 @@ final class CartController extends AbstractController
             $jeux = $items ?? [];
         }
 
+        // Calcule le total
+        $total = 0;
+        foreach ($jeux as $item) {
+            $total += $item['jeu']->getPrix() * $item['quantity'];
+        }
+
+        // Si un code promo est appliqué
+        if ($appliedPromoCode) {
+            $promoCode = $promoRepository->findOneBy(['code' => $appliedPromoCode]);
+            
+            if ($promoCode && $promoCode->getDateExpiration() > new \DateTime() && $promoCode->isActif()) {
+                $promoApplied = true;
+                $discount = $total * ($promoCode->getPourcentage() / 100);
+            } else {
+                $request->getSession()->remove('promo_code');
+            }
+        }
+
         return $this->render('cart/index.html.twig', [
             'jeux' => $jeux,
+            'promoApplied' => $promoApplied,
+            'promoCode' => $promoCode,
+            'discount' => $discount,
         ]);
+    }
+
+    #[Route('/cart/apply-promo', name: 'app_apply_promo', methods: ['POST'])]
+    public function applyPromo(Request $request, PromoCodeRepository $promoRepository): Response
+    {
+        $promoCode = $request->request->get('promo_code');
+        $request->getSession()->remove('promo_code'); // Supprime le code promo précédent avant d'appliquer le nouveau
+        $promo = $promoRepository->findOneBy(['code' => $promoCode]);
+        
+        if (!$promo) {
+            $this->addFlash('error', 'Code promo invalide');
+        } elseif ($promo->getDateExpiration() < new \DateTime()) {
+            $this->addFlash('error', 'Code promo expiré');
+        } elseif (!$promo->isActif()) {
+            $this->addFlash('error', 'Code promo désactivé');
+        } else {
+            $request->getSession()->set('promo_code', $promoCode);
+            $this->addFlash('success', 'Code promo appliqué !');
+        }
+        
+        return $this->redirectToRoute('app_cart');
+    }
+
+    #[Route('/cart/remove-promo', name: 'app_remove_promo', methods: ['POST'])]
+    public function removePromo(Request $request): Response
+    {
+        $request->getSession()->remove('promo_code');
+        $this->addFlash('success', 'Code promo supprimé');
+        return $this->redirectToRoute('app_cart');
     }
 
     #[Route('/jeu/{id}/panier', name: 'app_jeu_cart_toggle', methods: ['POST'])]
     public function toggleCart(
         Jeu $jeu,
         Request $request,
-        PanierItemRepository $cartRepository,
+        PanierItemRepository $cartItemsRepository,
+        PanierRepository $panierRepository,
     ): Response {
 
         /** @var \App\Entity\User|null $user */
@@ -74,13 +130,15 @@ final class CartController extends AbstractController
         if ($user) {
             $this->cartMerger->mergeSessionCartIfNeeded($user);
 
-            $existant = $cartRepository->findOneByPanierAndJeu($user->getPanier(), $jeu);
+            $panier = $panierRepository->findOrCreateForUser($user);
+
+            $existant = $cartItemsRepository->findOneByPanierAndJeu($panier, $jeu);
 
             if ($existant) {
-                $cartRepository->deleteFromCart($user->getPanier()->getId(), $jeu->getId());
+                $cartItemsRepository->deleteFromCart($panier->getId(), $jeu->getId());
                 $this->addFlash('success', 'Retiré du panier.');
             } else {
-                $cartRepository->addToCart($user->getPanier()->getId(), $jeu->getId());
+                $cartItemsRepository->addToCart($panier->getId(), $jeu->getId());
                 $this->addFlash('success', 'Ajouté au panier.');
             }
         } else {
@@ -98,7 +156,6 @@ final class CartController extends AbstractController
             $session->set('cart', $cart);
         }
 
-        //dd($request->getSession()->get('cart'));
         return $this->redirect($request->headers->get('referer') ?? $this->generateUrl('app_home'));
     }
 
