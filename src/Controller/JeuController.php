@@ -12,6 +12,7 @@ use App\Entity\Jeu;
 use App\Entity\WishlistItem;
 use App\Form\JeuForm;
 use App\Form\JeuEditType;
+use App\Repository\JeuCommentRepository;
 use Symfony\Component\String\Slugger\AsciiSlugger;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -61,13 +62,15 @@ final class JeuController extends AbstractController
     }
 
     #[Route('/jeu/{slug}/{id}', name: 'app_jeu', requirements: ['id' => '\d+'])]
-    public function apercu_jeu(JeuRepository $jeuRepository, string $slug): Response
+    public function apercu_jeu(JeuRepository $jeuRepository,JeuCommentRepository $jeuCommentRepository, string $slug): Response
     {
         $jeu = $jeuRepository->findOneBySlug($slug);
+        $comments = $jeuCommentRepository->findByJeu($jeu);
 
         return $this->render('jeu/index.html.twig', [
             'controller_name' => 'JeuController',
             'jeu' => $jeu,
+            'comments' => $comments,
         ]);
     }
 

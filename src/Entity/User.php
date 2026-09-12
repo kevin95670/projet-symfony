@@ -88,6 +88,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(targetEntity: WishlistItem::class, mappedBy: 'user')]
     private Collection $wishlistItems;
 
+    /**
+     * @var Collection<int, JeuComment>
+     */
+    #[ORM\OneToMany(targetEntity: JeuComment::class, mappedBy: 'auteur')]
+    private Collection $jeuComments;
+
     public function __construct()
     {
         $this->jeux = new ArrayCollection();
@@ -95,6 +101,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->avisEnvoyes = new ArrayCollection();
         $this->avisRecus = new ArrayCollection();
         $this->wishlistItems = new ArrayCollection();
+        $this->jeuComments = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -411,6 +418,36 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             // set the owning side to null (unless already changed)
             if ($wishlistItem->getUser() === $this) {
                 $wishlistItem->setUser(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, JeuComment>
+     */
+    public function getJeuComments(): Collection
+    {
+        return $this->jeuComments;
+    }
+
+    public function addJeuComment(JeuComment $jeuComment): static
+    {
+        if (!$this->jeuComments->contains($jeuComment)) {
+            $this->jeuComments->add($jeuComment);
+            $jeuComment->setAuteur($this);
+        }
+
+        return $this;
+    }
+
+    public function removeJeuComment(JeuComment $jeuComment): static
+    {
+        if ($this->jeuComments->removeElement($jeuComment)) {
+            // set the owning side to null (unless already changed)
+            if ($jeuComment->getAuteur() === $this) {
+                $jeuComment->setAuteur(null);
             }
         }
 

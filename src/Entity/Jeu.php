@@ -81,12 +81,19 @@ class Jeu
     #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $mise_a_jour = null;
 
+    /**
+     * @var Collection<int, JeuComment>
+     */
+    #[ORM\OneToMany(targetEntity: JeuComment::class, mappedBy: 'jeu')]
+    private Collection $jeuComments;
+
     public function __construct()
     {
         $this->categories = new ArrayCollection();
         $this->panierItems = new ArrayCollection();
         $this->commandeLignes = new ArrayCollection();
         $this->wishlistItems = new ArrayCollection();
+        $this->jeuComments = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -351,6 +358,36 @@ class Jeu
     public function setMiseAJour(?\DateTimeImmutable $mise_a_jour): static
     {
         $this->mise_a_jour = $mise_a_jour;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, JeuComment>
+     */
+    public function getJeuComments(): Collection
+    {
+        return $this->jeuComments;
+    }
+
+    public function addJeuComment(JeuComment $jeuComment): static
+    {
+        if (!$this->jeuComments->contains($jeuComment)) {
+            $this->jeuComments->add($jeuComment);
+            $jeuComment->setJeu($this);
+        }
+
+        return $this;
+    }
+
+    public function removeJeuComment(JeuComment $jeuComment): static
+    {
+        if ($this->jeuComments->removeElement($jeuComment)) {
+            // set the owning side to null (unless already changed)
+            if ($jeuComment->getJeu() === $this) {
+                $jeuComment->setJeu(null);
+            }
+        }
 
         return $this;
     }
