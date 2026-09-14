@@ -3,6 +3,8 @@
 namespace App\Controller;
 
 use App\Repository\AvisRepository;
+use App\Repository\JeuRepository;
+use App\Enum\JeuStatut;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
@@ -24,15 +26,42 @@ final class UserController extends AbstractController
     }
 
     #[Route('/vendeur/{pseudo}', name: 'vue_vendeur')]
-    public function apercu_vendeur(UserRepository $userRepository, AvisRepository $avisRepository, string $pseudo): Response
+    public function apercu_vendeur(
+        UserRepository $userRepository, 
+        AvisRepository $avisRepository, 
+        JeuRepository $jeuRepository,
+        string $pseudo
+    ): Response
     {
-
         $vendeur = $userRepository->findOneByPseudo($pseudo);
+
+        // Stats de ventes
+        $jeux = $jeuRepository->findBy(['vendeur' => $vendeur]);
+        
+        // Jeux vendus
+        $jeuxVendus = array_filter($jeux, fn($j) => $j->getStatut() === JeuStatut::VENDU);
+        $totalJeuxVendus = count($jeuxVendus);
+        
+        $prixTotal = array_reduce($jeuxVendus, function($carry, $jeu) {
+            return $carry + $jeu->getPrix();
+        }, 0);
+        
+        $prixMoyen = $totalJeuxVendus > 0 ? $prixTotal / $totalJeuxVendus : 0;
+
+        // Jeux en cours de vente
+        $jeuxEnCours = array_filter($jeux, fn($j) => $j->getStatut() === JeuStatut::EN_VENTE);
+        $prixTotalEnCours = array_reduce($jeuxEnCours, function($carry, $jeu) {
+            return $carry + $jeu->getPrix();
+        }, 0);
+        $prixMoyenEnCours = count($jeuxEnCours) > 0 ? $prixTotalEnCours / count($jeuxEnCours) : 0;
 
         return $this->render('user/vendeur.html.twig', [
             'controller_name' => 'UserController',
             'vendeur' => $vendeur,
             'moyenne' => $avisRepository->getMoyenneAvisByVendeur($vendeur),
+            'totalJeuxVendus' => $totalJeuxVendus,
+            'prixMoyen' => $prixMoyen,
+            'prixMoyenEnCours' => $prixMoyenEnCours,
         ]);
     }
 

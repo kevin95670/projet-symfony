@@ -83,6 +83,26 @@
 
     </div>
 
+    {# Stats de ventes #}
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-10 p-6 bg-slate-900 border border-slate-800 rounded-xl">
+        <div class="text-center">
+            <div class="text-3xl font-bold text-cyan-400">{{ totalJeuxVendus }}</div>
+            <div class="text-sm text-slate-400 mt-2">Jeux vendus</div>
+        </div>
+        <div class="text-center">
+            <div class="text-3xl font-bold text-cyan-400">{{ prixMoyen|number_format(2, ',', ' ') }} €</div>
+            <div class="text-sm text-slate-400 mt-2">Prix moyen (vendus)</div>
+        </div>
+        <div class="text-center">
+            <div class="text-3xl font-bold text-cyan-400">{{ prixMoyenEnCours|number_format(2, ',', ' ') }} €</div>
+            <div class="text-sm text-slate-400 mt-2">Prix moyen (en cours)</div>
+        </div>
+        <div class="text-center">
+            <div class="text-3xl font-bold text-cyan-400">{{ vendeur.jeux|length }}</div>
+            <div class="text-sm text-slate-400 mt-2">En vente actuellement</div>
+        </div>
+    </div>
+
     {# Annonces #}
     <h2 class="text-xl font-bold text-white mb-6">Ses annonces</h2>
 
