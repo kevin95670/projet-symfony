@@ -38,26 +38,32 @@ final class JeuController extends AbstractController
     #[Route('/jeux', name: 'app_jeux_liste')]
     public function jeu_recherche(JeuRepository $jeuRepository, Request $request, CategorieRepository $categorieRepository): Response
     {
-        $query = $request->query->get('q', '');
-        $categorySlug = $request->query->get('categorie', '');
-        $prixMax = $request->query->get('prix_max', '');
-        $prixMin = $request->query->get('prix_min', '');
-        $pegi = $request->query->get('pegi', '');
-        $criteres = [
-            'query' => $query,
-            'categorySlug' => $categorySlug,
-            'prixMax' => $prixMax,
-            'prixMin' => $prixMin,
-            'pegi' => $pegi,
+        // Nombre de jeux affichés par page, et page demandée dans l'URL (?page=2)
+        $parPage = 12;
+        $numeroPage = max(1, $request->query->getInt('page', 1));
+
+        // La navbar envoie "q", le formulaire de filtres envoie "query" : on accepte les deux
+        $query = $request->query->get('q') ?? $request->query->get('query', '');
+
+        $filtres = [
+            'query'     => $query,
+            'categorie' => $request->query->get('categorie', ''),
+            'prix_min'  => $request->query->get('prix_min', ''),
+            'prix_max'  => $request->query->get('prix_max', ''),
+            'pegi'      => $request->query->get('pegi', ''),
         ];
 
-        $jeux = $jeuRepository->findAllByRecherche($criteres);
+        // Jeux de la page demandée, et nombre total de pages
+        $jeux = $jeuRepository->trouverFiltres($filtres, $numeroPage, $parPage);
+        $nombrePages = (int) ceil(count($jeux) / $parPage);
 
         return $this->render('jeu/listing.html.twig', [
             'jeux' => $jeux,
             'query' => $query,
             'categories' => $categorieRepository->findAllOrderByOrdreAlphabetique(),
             'pegis' => Pegi::cases(),
+            'page' => $numeroPage,
+            'pages' => $nombrePages,
         ]);
     }
 

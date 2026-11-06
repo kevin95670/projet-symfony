@@ -8,11 +8,11 @@
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-10">
 
         {# Colonne image #}
-        <div class="aspect-[4/3] bg-slate-900 border border-slate-800 rounded-xl overflow-hidden">
+        <div class="aspect-[4/3] bg-[#2a2040] border border-[#2e2640] rounded-lg overflow-hidden">
             {% if jeu.image %}
                 <img src="{{ jeu.image }}" alt="{{ jeu.titre }}" class="w-full h-full object-cover">
             {% else %}
-                <div class="w-full h-full flex items-center justify-center text-slate-700">
+                <div class="w-full h-full flex items-center justify-center text-[#5d5573]">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1" stroke="currentColor" class="w-20 h-20">
                         <path stroke-linecap="round" stroke-linejoin="round" d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 0 0 1.5-1.5V6a1.5 1.5 0 0 0-1.5-1.5H3.75A1.5 1.5 0 0 0 2.25 6v12a1.5 1.5 0 0 0 1.5 1.5Zm10.5-11.25h.008v.008h-.008V8.25Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z" />
                     </svg>
@@ -25,27 +25,27 @@
 
             <h1 class="text-3xl font-bold text-white leading-tight mb-3">{{ jeu.titre }}</h1>
 
-            <div class="text-4xl font-bold text-white mb-6">{{ jeu.prix|number_format(2, ',', ' ') }} €</div>
+            <div class="text-4xl font-extrabold text-[#f5a623] mb-6">{{ jeu.prix|number_format(2, ',', ' ') }} €</div>
 
             <div class="flex flex-wrap gap-2 mb-6">
-                <span class="px-3 py-1 text-sm rounded-full bg-slate-800 text-slate-300">{{ jeu.plateforme.value }}</span>
-                <span class="px-3 py-1 text-sm rounded-full bg-slate-800 text-slate-300">{{ jeu.etat.value }}</span>
+                <span class="px-3 py-1 text-sm rounded-sm bg-[#1c1628] border border-[#2e2640] text-[#b9b0cc]">{{ jeu.plateforme.value }}</span>
+                <span class="px-3 py-1 text-sm rounded-sm bg-[#1c1628] border border-[#2e2640] text-[#b9b0cc]">{{ jeu.etat.value }}</span>
                 {% if jeu.pegi %}
-                    <span class="px-3 py-1 text-sm rounded-full bg-slate-800 text-slate-300">PEGI {{ jeu.pegi.value }}</span>
+                    <span class="px-3 py-1 text-sm rounded-sm bg-[#1c1628] border border-[#2e2640] text-[#b9b0cc]">PEGI {{ jeu.pegi.value }}</span>
                 {% endif %}
             </div>
 
-            <p class="text-slate-400 leading-relaxed mb-8">{{ jeu.description }}</p>
+            <p class="text-[#b9b0cc] leading-relaxed mb-8">{{ jeu.description }}</p>
 
             {# Vendeur #}
-            <div class="flex items-center gap-3 p-4 bg-slate-900 border border-slate-800 rounded-lg mb-8">
-                <img class="w-10 h-10 rounded-full bg-slate-800 shrink-0"
+            <div class="flex items-center gap-3 p-4 bg-[#1c1628] border border-[#2e2640] rounded-lg mb-8">
+                <img class="w-10 h-10 rounded-full bg-[#2a2040] shrink-0"
                      src="https://api.dicebear.com/9.x/avataaars/svg?seed={{ jeu.vendeur.pseudo }}"
                      alt="">
                 <div class="min-w-0">
-                    <div class="text-xs text-slate-500">Vendu par</div>
+                    <div class="text-xs text-[#8a82a0]">Vendu par</div>
                     <a href="{{ path('vue_vendeur', {'pseudo': jeu.vendeur.pseudo}) }}"
-                       class="font-medium text-white hover:text-cyan-400 transition">{{ jeu.vendeur.pseudo }}</a>
+                       class="font-medium text-white hover:text-[#f5a623] transition">{{ jeu.vendeur.pseudo }}</a>
                 </div>
             </div>
 
@@ -53,7 +53,7 @@
             <div class="flex flex-col sm:flex-row gap-3 mt-auto">
                 <form action="{{ path('app_jeu_cart_toggle', {'id': jeu.id}) }}" method="post" class="flex-1">
                     <input type="hidden" name="_token" value="{{ csrf_token('toggle-cart-' ~ jeu.id) }}">
-                    <button type="submit" class="w-full text-center bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-semibold py-3 px-6 rounded-lg transition">
+                    <button type="submit" class="w-full text-center bg-white hover:bg-[#f5a623] text-[#111] font-bold text-sm py-3 px-6 rounded-md transition">
                         Ajouter au panier
                     </button>
                 </form>
@@ -61,7 +61,7 @@
                 {% if app.user %}
                     <form action="{{ path('app_jeu_wishlist_toggle', {'id': jeu.id}) }}" method="post">
                         <input type="hidden" name="_token" value="{{ csrf_token('toggle-wishlist-' ~ jeu.id) }}">
-                        <button type="submit" class="flex items-center justify-center gap-2 border border-slate-700 hover:border-slate-500 text-slate-300 hover:text-white font-medium py-3 px-6 rounded-lg transition">
+                        <button type="submit" class="flex items-center justify-center gap-2 border border-[#2e2640] hover:border-[#f5a623] text-[#b9b0cc] hover:text-white font-medium text-sm py-3 px-6 rounded-md transition">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z" />
                             </svg>
@@ -69,7 +69,7 @@
                         </button>
                     </form>
                 {% else %}
-                    <a href="{{ path('app_login') }}" class="flex items-center justify-center gap-2 border border-slate-700 hover:border-slate-500 text-slate-300 hover:text-white font-medium py-3 px-6 rounded-lg transition">
+                    <a href="{{ path('app_login') }}" class="flex items-center justify-center gap-2 border border-[#2e2640] hover:border-[#f5a623] text-[#b9b0cc] hover:text-white font-medium text-sm py-3 px-6 rounded-md transition">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z" />
                         </svg>
@@ -82,7 +82,7 @@
     </div>
 
     {# Section Commentaires #}
-    <div class="max-w-6xl mx-auto px-4 py-12 border-t border-slate-800 mt-12">
+    <div class="max-w-6xl mx-auto px-4 py-12 border-t border-[#2e2640] mt-12">
         <h2 class="text-2xl font-bold text-white mb-8">Fil de discussion</h2>
 
         {# Liste des commentaires #}
@@ -90,45 +90,45 @@
             <div class="space-y-4 mb-8">
                 {% for comment in comments %}
                     {% if comment.isDeleted %}
-                        <div class="p-4 bg-slate-900 border border-slate-800 rounded-lg opacity-50">
-                            <p class="text-slate-500 italic">Ce commentaire a été supprimé</p>
+                        <div class="p-4 bg-[#1c1628] border border-[#2e2640] rounded-lg opacity-50">
+                            <p class="text-[#8a82a0] italic">Ce commentaire a été supprimé</p>
                         </div>
                     {% else %}
-                        <div class="p-4 bg-slate-900 border border-slate-800 rounded-lg" data-comment-id="{{ comment.id }}">
+                        <div class="p-4 bg-[#1c1628] border border-[#2e2640] rounded-lg" data-comment-id="{{ comment.id }}">
                             <div class="flex justify-between items-start mb-2">
                                 <div>
                                     <p class="font-semibold text-white">{{ comment.auteur.pseudo }}</p>
-                                    <p class="text-sm text-slate-500">{{ comment.dateCreation|date('d/m/Y H:i') }}</p>
+                                    <p class="text-sm text-[#8a82a0]">{{ comment.dateCreation|date('d/m/Y H:i') }}</p>
                                     {% if comment.dateModification %}
-                                        <p class="text-xs text-slate-600">Modifié le {{ comment.dateModification|date('d/m/Y H:i') }}</p>
+                                        <p class="text-xs text-[#5d5573]">Modifié le {{ comment.dateModification|date('d/m/Y H:i') }}</p>
                                     {% endif %}
                                 </div>
                                 {% if app.user and app.user == comment.auteur %}
                                     <div class="flex gap-2">
-                                        <button type="button" class="text-sm text-cyan-400 hover:text-cyan-300 btn-edit-comment" data-comment-id="{{ comment.id }}">Modifier</button>
+                                        <button type="button" class="text-sm text-[#f5a623] hover:text-white btn-edit-comment" data-comment-id="{{ comment.id }}">Modifier</button>
                                         <form action="{{ path('app_comment_delete', {'jeuId': jeu.id, 'commentId': comment.id}) }}" method="post" style="display:inline;">
                                             <input type="hidden" name="_token" value="{{ csrf_token('delete-comment-' ~ comment.id) }}">
-                                            <button type="submit" class="text-sm text-red-400 hover:text-red-300" onclick="return confirm('Supprimer ?')">Supprimer</button>
+                                            <button type="submit" class="text-sm text-[#ff8a80] hover:text-white" onclick="return confirm('Supprimer ?')">Supprimer</button>
                                         </form>
                                     </div>
                                 {% endif %}
                             </div>
-                            
+
                             {# Contenu du commentaire (visible par défaut) #}
-                            <p class="text-slate-300 comment-content">{{ comment.contenu }}</p>
+                            <p class="text-[#b9b0cc] comment-content">{{ comment.contenu }}</p>
 
                             {# Formulaire d'édition (caché par défaut) #}
                             <div class="comment-edit-form hidden mt-4">
                                 <form action="{{ path('app_comment_update', {'jeuId': jeu.id, 'commentId': comment.id}) }}" method="post">
-                                    <textarea name="comment[contenu]" 
-                                              class="w-full p-3 bg-slate-800 border border-slate-700 rounded text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500 resize-none"
+                                    <textarea name="comment[contenu]"
+                                              class="w-full p-3 bg-[#110d1b] border border-[#2e2640] rounded-md text-white placeholder-[#5d5573] focus:outline-none focus:border-[#f5a623] resize-none"
                                               rows="4"
                                               required>{{ comment.contenu }}</textarea>
                                     <div class="flex gap-2 mt-3">
-                                        <button type="submit" class="bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-semibold py-2 px-4 rounded transition">
+                                        <button type="submit" class="bg-white hover:bg-[#f5a623] text-[#111] font-bold text-sm py-2 px-4 rounded-md transition">
                                             Valider
                                         </button>
-                                        <button type="button" class="btn-cancel-edit border border-slate-700 hover:border-slate-500 text-slate-300 hover:text-white font-semibold py-2 px-4 rounded transition">
+                                        <button type="button" class="btn-cancel-edit border border-[#2e2640] hover:border-[#f5a623] text-[#b9b0cc] hover:text-white font-medium text-sm py-2 px-4 rounded-md transition">
                                             Annuler
                                         </button>
                                     </div>
@@ -139,26 +139,26 @@
                 {% endfor %}
             </div>
         {% else %}
-            <p class="text-slate-500 mb-8">Aucun commentaire pour le moment...</p>
+            <p class="text-[#8a82a0] mb-8">Aucun commentaire pour le moment...</p>
         {% endif %}
 
         {# Formulaire d'ajout de commentaire #}
         {% if app.user %}
-            <div class="p-4 bg-slate-900 border border-slate-800 rounded-lg">
+            <div class="p-4 bg-[#1c1628] border border-[#2e2640] rounded-lg">
                 <form action="{{ path('app_comment_create', {'jeuId': jeu.id}) }}" method="post">
-                    <textarea name="comment[contenu]" 
-                              placeholder="Partage ton avis sur ce jeu..." 
-                              class="w-full p-3 bg-slate-800 border border-slate-700 rounded text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500 resize-none"
+                    <textarea name="comment[contenu]"
+                              placeholder="Partage ton avis sur ce jeu..."
+                              class="w-full p-3 bg-[#110d1b] border border-[#2e2640] rounded-md text-white placeholder-[#5d5573] focus:outline-none focus:border-[#f5a623] resize-none"
                               rows="4"
                               required></textarea>
-                    <button type="submit" class="mt-3 bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-semibold py-2 px-6 rounded transition">
+                    <button type="submit" class="mt-3 bg-white hover:bg-[#f5a623] text-[#111] font-bold text-sm py-2 px-6 rounded-md transition">
                         Poster
                     </button>
                 </form>
             </div>
         {% else %}
-            <div class="p-4 bg-slate-900 border border-slate-800 rounded-lg text-center">
-                <p class="text-slate-400"><a href="{{ path('app_login') }}" class="text-cyan-400 hover:text-cyan-300">Connecte-toi</a> pour commenter</p>
+            <div class="p-4 bg-[#1c1628] border border-[#2e2640] rounded-lg text-center">
+                <p class="text-[#b9b0cc]"><a href="{{ path('app_login') }}" class="text-[#f5a623] hover:text-white">Connecte-toi</a> pour commenter</p>
             </div>
         {% endif %}
     </div>

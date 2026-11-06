@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html>
+<html lang="fr">
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>{% block title %}Welcome!{% endblock %}</title>
+        <title>{% block title %}Replay{% endblock %}</title>
         <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>⚫️</text><text y=%221.3em%22 x=%220.2em%22 font-size=%2276%22 fill=%22%23fff%22>sf</text></svg>">
         {% block stylesheets %}
             <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
@@ -22,128 +22,129 @@
         <script src="https://cdn.jsdelivr.net/npm/frankenphp-hot-reload/+esm" type="module"></script>
         {% endif %}
     </head>
-    <body class="bg-blue-500">
+    <body class="bg-[#0d0a14] text-white font-sans antialiased">
 
         {% block header %}
 
         <header>
-            <nav class="bg-slate-900 border-b border-slate-800">
-            <div class="max-w-7xl mx-auto px-4">
-                <div class="flex items-center justify-between h-16">
+            <nav class="bg-[#110d1b] border-b border-[#2e2640] sticky top-0 z-20">
+                <div class="max-w-7xl mx-auto px-4">
+                    <div class="flex items-center gap-4 h-16">
 
-                {# Logo à gauche #}
-                <a href="{{ path('app_home') }}" class="text-xl font-bold text-white">
-                    Replay
-                </a>
+                        {# Logo #}
+                        <a href="{{ path('app_home') }}" class="text-xl font-extrabold tracking-wider text-white shrink-0">
+                            RE<span class="text-[#f5a623]">PLAY</span>
+                        </a>
 
-                {# Liens de navigation - cachés sur mobile #}
-                <div class="hidden md:flex items-center gap-6">
-                    <a href="{{ path('app_jeux_liste') }}" class="text-slate-300 hover:text-white transition">Acheter un jeu</a>
-                    <a href="{{ app.user ? path('app_jeu_vendre') : path('app_login') }}" class="text-slate-300 hover:text-white transition">Vendre un jeu</a>
-                    <a href="{{ app.user ? path('app_wishlist') : path('app_login') }}" class="text-slate-300 hover:text-white transition">Ma liste de souhaits</a>
+                        {# Liens de navigation - cachés sur mobile #}
+                        <div class="hidden md:flex items-center gap-6 ml-auto text-sm text-[#b9b0cc]">
+                            <a href="{{ path('app_jeux_liste') }}" class="hover:text-[#f5a623] transition">Acheter un jeu</a>
+                            <a href="{{ app.user ? path('app_jeu_vendre') : path('app_login') }}" class="hover:text-[#f5a623] transition">Vendre un jeu</a>
+                            <a href="{{ app.user ? path('app_wishlist') : path('app_login') }}" class="hover:text-[#f5a623] transition">Liste de souhaits</a>
+                        </div>
+
+                        {# Icônes à droite #}
+                        <div class="flex items-center gap-4 ml-auto md:ml-0">
+
+                            {# Moteur de recherche - caché sur mobile #}
+                            <form method="GET" action="{{ path('app_jeux_liste') }}" class="hidden sm:flex items-center">
+                                <div class="relative">
+                                    <svg class="w-4 h-4 text-[#8a82a0] absolute left-3 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-4.35-4.35M17 11a6 6 0 11-12 0 6 6 0 0112 0z" />
+                                    </svg>
+                                    <input
+                                        type="text"
+                                        name="q"
+                                        value="{{ app.request.query.get('q') }}"
+                                        placeholder="Rechercher un jeu..."
+                                        class="bg-[#1c1628] border border-[#2e2640] text-sm text-white placeholder-[#8a82a0] rounded-md pl-9 pr-3 py-1.5 w-48 lg:w-56 focus:outline-none focus:border-[#f5a623] transition"
+                                    >
+                                </div>
+                            </form>
+
+                            {# Panier - toujours visible #}
+                            <a href="{{ path('app_cart') }}" class="relative text-[#b9b0cc] hover:text-[#f5a623] transition" title="Panier">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+                                </svg>
+
+                                {% set count = panier_count() %}
+                                {% if count > 0 %}
+                                    <span class="absolute -top-2 -right-2 bg-[#f5a623] text-[#111] text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+                                        {{ count }}
+                                    </span>
+                                {% endif %}
+                            </a>
+
+                            {# Compte #}
+                            {% if app.user %}
+                                <div class="relative group">
+                                    <button class="text-[#b9b0cc] hover:text-[#f5a623] transition" title="Mon compte">
+                                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                                        </svg>
+                                    </button>
+
+                                    <div class="absolute z-30 right-0 top-full pt-2 w-52 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition">
+                                        <div class="bg-[#1c1628] border border-[#2e2640] rounded-md shadow-xl py-2">
+
+                                            <div class="px-4 py-2 border-b border-[#2e2640]">
+                                                <div class="text-sm font-medium text-white truncate">{{ app.user.pseudo }}</div>
+                                            </div>
+
+                                            <a href="{{ path('app_profil') }}" class="block px-4 py-2 text-sm text-[#b9b0cc] hover:bg-[#2e2640] hover:text-white transition">Mon profil</a>
+                                            <a href="{{ path('app_commandes') }}" class="block px-4 py-2 text-sm text-[#b9b0cc] hover:bg-[#2e2640] hover:text-white transition">Mes commandes</a>
+                                            <a href="{{ path('app_ventes', {'vendeurId': app.user.id}) }}" class="block px-4 py-2 text-sm text-[#b9b0cc] hover:bg-[#2e2640] hover:text-white transition">Mes ventes</a>
+                                            <a href="{{ path('app_wishlist') }}" class="block px-4 py-2 text-sm text-[#b9b0cc] hover:bg-[#2e2640] hover:text-white transition">Ma liste de souhaits</a>
+
+                                            <div class="border-t border-[#2e2640] mt-2 pt-2">
+                                                <a href="{{ path('app_logout') }}" class="block px-4 py-2 text-sm text-[#ff8a80] hover:bg-[#2e2640] transition">Se déconnecter</a>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                </div>
+                            {% else %}
+                                <a href="{{ path('app_login') }}" class="text-[#b9b0cc] hover:text-[#f5a623] transition" title="Se connecter">
+                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                                    </svg>
+                                </a>
+                            {% endif %}
+
+                            {# Bouton burger - mobile seulement #}
+                            <button id="burger" class="md:hidden text-[#b9b0cc] hover:text-[#f5a623] transition" title="Menu">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                                </svg>
+                            </button>
+
+                        </div>
+                    </div>
                 </div>
 
-                {# Icônes à droite #}
-                <div class="flex items-center gap-4">
-                    {# Moteur de recherche - caché sur mobile #}
-                    <form method="GET" action="{{ path('app_jeux_liste') }}" class="hidden sm:flex items-center">
+                {# Menu mobile déroulant #}
+                <div id="mobile-menu" class="hidden md:hidden border-t border-[#2e2640] px-4 pb-4 pt-4 space-y-2 bg-[#110d1b]">
+
+                    <form method="GET" action="{{ path('app_jeux_liste') }}" class="pb-2">
                         <div class="relative">
-                            <svg class="w-4 h-4 text-slate-500 absolute left-3 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg class="w-4 h-4 text-[#8a82a0] absolute left-3 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-4.35-4.35M17 11a6 6 0 11-12 0 6 6 0 0112 0z" />
                             </svg>
                             <input
                                 type="text"
                                 name="q"
                                 value="{{ app.request.query.get('q') }}"
-                                placeholder="Rechercher un jeu, une catégorie, un vendeur..."
-                                class="bg-slate-800 border border-slate-700 text-sm text-white placeholder-slate-500 rounded-lg pl-9 pr-3 py-1.5 w-48 lg:w-64 focus:outline-none focus:border-cyan-500 transition"
+                                placeholder="Rechercher un jeu..."
+                                class="w-full bg-[#1c1628] border border-[#2e2640] text-sm text-white placeholder-[#8a82a0] rounded-md pl-9 pr-3 py-2 focus:outline-none focus:border-[#f5a623] transition"
                             >
                         </div>
                     </form>
 
-                    {# Panier - toujours visible, même mobile #}
-                    <a href="{{ path('app_cart') }}" class="relative text-slate-300 hover:text-white transition" title="Panier">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
-                        </svg>
-
-                        {% set count = panier_count() %}
-                        {% if count > 0 %}
-                            <span class="absolute -top-2 -right-2 bg-cyan-500 text-slate-950 text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
-                                {{ count }}
-                            </span>
-                        {% endif %}
-                    </a>
-
-                    {# Profil - toujours visible, même mobile #}
-                    {% if app.user %}
-                        <div class="relative group">
-                            <button class="text-slate-300 hover:text-white transition" title="Mon compte">
-                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                                </svg>
-                            </button>
-
-                            <div class="absolute z-30 right-0 top-full pt-2 w-52 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition">
-                                <div class="bg-slate-800 border border-slate-700 rounded-lg shadow-xl py-2">
-
-                                    <div class="px-4 py-2 border-b border-slate-700">
-                                        <div class="text-sm font-medium text-white truncate">{{ app.user.pseudo }}</div>
-                                    </div>
-
-                                    <a href="{{ path('app_profil') }}" class="block px-4 py-2 text-sm text-slate-300 hover:bg-slate-700 hover:text-white transition">Mon profil</a>
-                                    <a href="{{ path('app_commandes') }}" class="block px-4 py-2 text-sm text-slate-300 hover:bg-slate-700 hover:text-white transition">Mes commandes</a>
-                                    <a href="{{ path('app_ventes', {'vendeurId': app.user.id}) }}" class="block px-4 py-2 text-sm text-slate-300 hover:bg-slate-700 hover:text-white transition">Mes ventes</a>
-                                    <a href="{{ path('app_wishlist') }}" class="block px-4 py-2 text-sm text-slate-300 hover:bg-slate-700 hover:text-white transition">Ma liste de souhaits</a>
-
-                                    <div class="border-t border-slate-700 mt-2 pt-2">
-                                        <a href="{{ path('app_logout') }}" class="block px-4 py-2 text-sm text-red-400 hover:bg-slate-700 transition">Se déconnecter</a>
-                                    </div>
-
-                                </div>
-                            </div>
-                        </div>
-                    {% else %}
-                        <a href="{{ path('app_login') }}" class="text-slate-300 hover:text-white transition" title="Se connecter">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                            </svg>
-                        </a>
-                    {% endif %}
-
-                    {# Bouton burger - mobile seulement #}
-                    <button id="burger" class="md:hidden text-slate-300 hover:text-white transition" title="Menu">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
-                        </svg>
-                    </button>
-
+                    <a href="{{ path('app_jeux_liste') }}" class="block text-[#b9b0cc] hover:text-[#f5a623] py-2">Acheter un jeu</a>
+                    <a href="{{ app.user ? path('app_jeu_vendre') : path('app_login') }}" class="block text-[#b9b0cc] hover:text-[#f5a623] py-2">Vendre un jeu</a>
+                    <a href="{{ app.user ? path('app_wishlist') : path('app_login') }}" class="block text-[#b9b0cc] hover:text-[#f5a623] py-2">Liste de souhaits</a>
                 </div>
-            </div>
-
-            {# Menu mobile déroulant - liens uniquement, panier/profil déjà visibles en haut #}
-            <div id="mobile-menu" class="hidden md:hidden border-t border-slate-800 px-4 pb-4 pt-4 space-y-2">
-
-                {# Moteur de recherche mobile #}
-                <form method="GET" action="{{ path('app_jeux_liste') }}" class="pb-2">
-                    <div class="relative">
-                        <svg class="w-4 h-4 text-slate-500 absolute left-3 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-4.35-4.35M17 11a6 6 0 11-12 0 6 6 0 0112 0z" />
-                        </svg>
-                        <input
-                            type="text"
-                            name="q"
-                            value="{{ app.request.query.get('q') }}"
-                            placeholder="Rechercher un jeu..."
-                            class="w-full bg-slate-800 border border-slate-700 text-sm text-white placeholder-slate-500 rounded-lg pl-9 pr-3 py-2 focus:outline-none focus:border-cyan-500 transition"
-                        >
-                    </div>
-                </form>
-
-                <a href="{{ path('app_jeux_liste') }}" class="block text-slate-300 hover:text-white py-2">Acheter un jeu</a>
-                <a href="{{ app.user ? path('app_jeu_vendre') : path('app_login') }}" class="block text-slate-300 hover:text-white py-2">Vendre un jeu</a>
-                <a href="{{ app.user ? path('app_wishlist') : path('app_login') }}" class="block text-slate-300 hover:text-white py-2">Ma liste de souhaits</a>
-            </div>
 
             </nav>
         </header>

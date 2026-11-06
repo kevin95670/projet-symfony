@@ -1,0 +1,37 @@
+{% if pages > 1 %}
+    {% set base = app.request.query.all %}
+
+    <nav class="flex items-center justify-center gap-2 mt-10" aria-label="Pagination">
+
+        {# Page précédente #}
+        {% if page > 1 %}
+            <a href="{{ path('app_jeux_liste', base|merge({page: page - 1})) }}"
+               class="px-3 py-1.5 text-sm rounded-md border border-[#2e2640] text-[#b9b0cc] hover:border-[#f5a623] hover:text-white transition">‹</a>
+        {% else %}
+            <span class="px-3 py-1.5 text-sm rounded-md border border-[#2e2640] text-[#5d5573] opacity-40 cursor-not-allowed">‹</span>
+        {% endif %}
+
+        {# Numéros de page : 1, la dernière, et les pages autour de la page courante #}
+        {% for p in 1..pages %}
+            {% if p == 1 or p == pages or (p >= page - 2 and p <= page + 2) %}
+                {% if p == page %}
+                    <span class="px-3 py-1.5 text-sm font-bold rounded-md bg-[#f5a623] text-[#111]">{{ p }}</span>
+                {% else %}
+                    <a href="{{ path('app_jeux_liste', base|merge({page: p})) }}"
+                       class="px-3 py-1.5 text-sm rounded-md border border-[#2e2640] text-[#b9b0cc] hover:border-[#f5a623] hover:text-white transition">{{ p }}</a>
+                {% endif %}
+            {% elseif p == page - 3 or p == page + 3 %}
+                <span class="px-1 text-[#5d5573]">…</span>
+            {% endif %}
+        {% endfor %}
+
+        {# Page suivante #}
+        {% if page < pages %}
+            <a href="{{ path('app_jeux_liste', base|merge({page: page + 1})) }}"
+               class="px-3 py-1.5 text-sm rounded-md border border-[#2e2640] text-[#b9b0cc] hover:border-[#f5a623] hover:text-white transition">›</a>
+        {% else %}
+            <span class="px-3 py-1.5 text-sm rounded-md border border-[#2e2640] text-[#5d5573] opacity-40 cursor-not-allowed">›</span>
+        {% endif %}
+
+    </nav>
+{% endif %}

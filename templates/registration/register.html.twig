@@ -6,10 +6,10 @@
 <div class="min-h-[70vh] flex items-center justify-center px-4 py-12">
     <div class="w-full max-w-md">
 
-        <div class="bg-slate-900 border border-slate-800 rounded-xl p-8">
+        <div class="bg-[#1c1628] border border-[#2e2640] rounded-lg p-8">
 
             <h1 class="text-2xl font-bold text-white mb-1">Créer un compte</h1>
-            <p class="text-sm text-slate-400 mb-8">Achetez et vendez vos jeux en quelques clics.</p>
+            <p class="text-sm text-[#b9b0cc] mb-8">Achetez et vendez vos jeux en quelques clics.</p>
 
             {{ form_errors(registrationForm) }}
 
@@ -22,16 +22,16 @@
                 {{ form_row(registrationForm.plainPassword, { label: 'Mot de passe' }) }}
                 {{ form_row(registrationForm.agreeTerms) }}
 
-                <button type="submit" class="w-full bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-semibold py-3 rounded-lg transition">
+                <button type="submit" class="w-full bg-white hover:bg-[#f5a623] text-[#111] font-bold text-sm py-3 rounded-md transition">
                     Créer mon compte
                 </button>
             {{ form_end(registrationForm) }}
 
         </div>
 
-        <p class="text-center text-sm text-slate-400 mt-6">
+        <p class="text-center text-sm text-[#b9b0cc] mt-6">
             Déjà inscrit ?
-            <a href="{{ path('app_login') }}" class="text-cyan-400 hover:text-cyan-300 font-medium transition">Se connecter</a>
+            <a href="{{ path('app_login') }}" class="text-[#f5a623] hover:text-white font-medium transition">Se connecter</a>
         </p>
 
     </div>

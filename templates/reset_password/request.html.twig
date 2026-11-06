@@ -6,15 +6,15 @@
 <div class="min-h-[70vh] flex items-center justify-center px-4 py-12">
     <div class="w-full max-w-md">
 
-        <div class="bg-slate-900 border border-slate-800 rounded-xl p-8">
+        <div class="bg-[#1c1628] border border-[#2e2640] rounded-lg p-8">
 
             <h1 class="text-2xl font-bold text-white mb-1">Mot de passe oublié</h1>
-            <p class="text-sm text-slate-400 mb-8">
+            <p class="text-sm text-[#b9b0cc] mb-8">
                 Saisissez votre adresse email, nous vous enverrons un lien pour définir un nouveau mot de passe.
             </p>
 
             {% for flash_error in app.flashes('reset_password_error') %}
-                <div class="mb-6 px-4 py-3 rounded-lg bg-red-500/10 border border-red-500/30 text-red-400 text-sm">
+                <div class="mb-6 px-4 py-3 rounded-md bg-[#ff8a80]/10 border border-[#ff8a80]/30 text-[#ff8a80] text-sm">
                     {{ flash_error }}
                 </div>
             {% endfor %}
@@ -24,7 +24,7 @@
                 {{ form_row(requestForm.email, { label: 'Adresse email' }) }}
 
                 <button type="submit"
-                        class="w-full bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-semibold py-3 rounded-lg transition">
+                        class="w-full bg-white hover:bg-[#f5a623] text-[#111] font-bold text-sm py-3 rounded-md transition">
                     Envoyer le lien
                 </button>
 
@@ -32,8 +32,8 @@
 
         </div>
 
-        <p class="text-center text-sm text-slate-400 mt-6">
-            <a href="{{ path('app_login') }}" class="text-cyan-400 hover:text-cyan-300 font-medium transition">
+        <p class="text-center text-sm text-[#b9b0cc] mt-6">
+            <a href="{{ path('app_login') }}" class="text-[#f5a623] hover:text-white font-medium transition">
                 ← Retour à la connexion
             </a>
         </p>

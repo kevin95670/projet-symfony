@@ -8,15 +8,15 @@
     <h1 class="text-2xl font-bold text-white mb-8">Mes commandes</h1>
 
     {% for message in app.flashes('success') %}
-        <div class="mb-6 rounded-lg bg-green-50 border border-green-200 text-green-700 px-4 py-3 text-sm">
+        <div class="mb-6 rounded-md bg-[#9ae6b4]/10 border border-[#9ae6b4]/30 text-[#9ae6b4] px-4 py-3 text-sm">
             {{ message }}
         </div>
     {% endfor %}
 
     {% if commandes is empty %}
-        <div class="bg-slate-900 border border-slate-800 rounded-xl p-10 text-center">
-            <p class="text-slate-400 text-lg mb-4">Vous n'avez pas encore passé de commande.</p>
-            <a href="{{ path('app_home') }}" class="inline-block bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-semibold px-6 py-2.5 rounded-lg transition">
+        <div class="bg-[#1c1628] border border-[#2e2640] rounded-lg p-10 text-center">
+            <p class="text-[#b9b0cc] text-lg mb-4">Vous n'avez pas encore passé de commande.</p>
+            <a href="{{ path('app_home') }}" class="inline-block bg-[#f5a623] hover:bg-[#ffb84d] text-[#111] font-bold text-sm px-6 py-2.5 rounded-md transition">
                 Parcourir les annonces
             </a>
         </div>
@@ -28,11 +28,11 @@
                     {% set total = total + (ligne.prixUnitaire * ligne.quantite) %}
                 {% endfor %}
 
-                <div class="bg-slate-900 border border-slate-800 rounded-xl p-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 hover:border-slate-700 transition">
+                <div class="bg-[#1c1628] border border-[#2e2640] rounded-lg p-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 hover:border-[#f5a623]/60 transition">
 
                     <div class="flex items-center gap-4">
-                        <div class="w-12 h-12 rounded-lg bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center shrink-0">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 text-cyan-400">
+                        <div class="w-12 h-12 rounded-md bg-[#f5a623]/10 border border-[#f5a623]/40 flex items-center justify-center shrink-0">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 text-[#f5a623]">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M9 14.25l6-6m4.5-3.493V21.75l-3.75-1.5-3.75 1.5-3.75-1.5-3.75 1.5V4.757c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0111.186 0c1.1.128 1.907 1.077 1.907 2.185z" />
                             </svg>
                         </div>
@@ -41,7 +41,7 @@
                             <p class="font-semibold text-white">
                                 Commande {% if commande.reference is defined and commande.reference %}#{{ commande.reference }}{% else %}#{{ commande.id }}{% endif %}
                             </p>
-                            <p class="text-sm text-slate-400 mt-0.5">
+                            <p class="text-sm text-[#8a82a0] mt-0.5">
                                 {% if commande.dateCommande is defined and commande.dateCommande %}
                                     {{ commande.dateCommande|date('d/m/Y à H:i') }}
                                 {% endif %}
@@ -51,14 +51,14 @@
 
                     <div class="flex items-center gap-6">
                         <div class="text-right">
-                            <p class="text-lg font-bold text-white">{{ total|number_format(2, ',', ' ') }} €</p>
-                            <p class="text-xs text-slate-500">
+                            <p class="text-lg font-bold text-[#f5a623]">{{ total|number_format(2, ',', ' ') }} €</p>
+                            <p class="text-xs text-[#8a82a0]">
                                 {{ commande.commandeLignes|length }} article{{ commande.commandeLignes|length > 1 ? 's' : '' }}
                             </p>
                         </div>
 
                         <a href="{{ path('app_commande', {'id': commande.id}) }}"
-                           class="whitespace-nowrap bg-slate-800 hover:bg-slate-700 text-white text-sm font-medium px-5 py-2.5 rounded-lg transition">
+                           class="whitespace-nowrap bg-white hover:bg-[#f5a623] text-[#111] text-sm font-bold px-5 py-2.5 rounded-md transition">
                             Voir le détail
                         </a>
                     </div>

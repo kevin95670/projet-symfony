@@ -5,18 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Confirmation de commande</title>
 </head>
-<body style="margin: 0; padding: 0; background-color: #0f172a; font-family: Arial, Helvetica, sans-serif;">
+<body style="margin: 0; padding: 0; background-color: #0d0a14; font-family: Arial, Helvetica, sans-serif;">
 
-    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color: #0f172a; padding: 40px 0;">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color: #0d0a14; padding: 40px 0;">
         <tr>
             <td align="center">
 
-                <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="background-color: #1e293b; border-radius: 12px; overflow: hidden; border: 1px solid #334155;">
+                <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="background-color: #1c1628; border-radius: 12px; overflow: hidden; border: 1px solid #2e2640;">
 
                     {# Header #}
                     <tr>
-                        <td style="background-color: #06b6d4; padding: 32px 40px; text-align: center;">
-                            <h1 style="margin: 0; font-size: 22px; color: #0f172a; font-weight: bold;">
+                        <td style="background-color: #f5a623; padding: 32px 40px; text-align: center;">
+                            <h1 style="margin: 0; font-size: 22px; color: #111111; font-weight: bold;">
                                 Merci pour votre commande !
                             </h1>
                         </td>
@@ -25,10 +25,10 @@
                     {# Intro #}
                     <tr>
                         <td style="padding: 32px 40px 16px;">
-                            <p style="margin: 0 0 8px; font-size: 16px; color: #e2e8f0;">
+                            <p style="margin: 0 0 8px; font-size: 16px; color: #ffffff;">
                                 Bonjour {{ user.pseudo ?? user.email }},
                             </p>
-                            <p style="margin: 0; font-size: 14px; color: #94a3b8; line-height: 1.6;">
+                            <p style="margin: 0; font-size: 14px; color: #b9b0cc; line-height: 1.6;">
                                 Nous vous confirmons la bonne réception de votre commande
                                 {% if commande.numero is defined %}n°{{ commande.numero }}{% endif %}
                                 {% if commande.dateCommande is defined %}
@@ -45,16 +45,16 @@
                             <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
                                 <thead>
                                     <tr>
-                                        <td style="padding: 8px 0; border-bottom: 1px solid #334155; font-size: 12px; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px;">
+                                        <td style="padding: 8px 0; border-bottom: 1px solid #2e2640; font-size: 12px; color: #8a82a0; text-transform: uppercase; letter-spacing: 0.5px;">
                                             Jeu
                                         </td>
-                                        <td style="padding: 8px 0; border-bottom: 1px solid #334155; font-size: 12px; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; text-align: center;">
+                                        <td style="padding: 8px 0; border-bottom: 1px solid #2e2640; font-size: 12px; color: #8a82a0; text-transform: uppercase; letter-spacing: 0.5px; text-align: center;">
                                             Qté
                                         </td>
-                                        <td style="padding: 8px 0; border-bottom: 1px solid #334155; font-size: 12px; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; text-align: right;">
+                                        <td style="padding: 8px 0; border-bottom: 1px solid #2e2640; font-size: 12px; color: #8a82a0; text-transform: uppercase; letter-spacing: 0.5px; text-align: right;">
                                             Prix
                                         </td>
-                                        <td style="padding: 8px 0; border-bottom: 1px solid #334155; font-size: 12px; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; text-align: right;">
+                                        <td style="padding: 8px 0; border-bottom: 1px solid #2e2640; font-size: 12px; color: #8a82a0; text-transform: uppercase; letter-spacing: 0.5px; text-align: right;">
                                             Total
                                         </td>
                                     </tr>
@@ -65,16 +65,16 @@
                                         {% set sous_total = item.prixUnitaire * item.quantite %}
                                         {% set total_general = total_general + sous_total %}
                                         <tr>
-                                            <td style="padding: 14px 0; border-bottom: 1px solid #293548; font-size: 14px; color: #e2e8f0;">
+                                            <td style="padding: 14px 0; border-bottom: 1px solid #2e2640; font-size: 14px; color: #ffffff;">
                                                 {{ item.jeu.titre }}
                                             </td>
-                                            <td style="padding: 14px 0; border-bottom: 1px solid #293548; font-size: 14px; color: #94a3b8; text-align: center;">
+                                            <td style="padding: 14px 0; border-bottom: 1px solid #2e2640; font-size: 14px; color: #b9b0cc; text-align: center;">
                                                 {{ item.quantite }}
                                             </td>
-                                            <td style="padding: 14px 0; border-bottom: 1px solid #293548; font-size: 14px; color: #94a3b8; text-align: right;">
+                                            <td style="padding: 14px 0; border-bottom: 1px solid #2e2640; font-size: 14px; color: #b9b0cc; text-align: right;">
                                                 {{ item.prixUnitaire|number_format(2, ',', ' ') }} €
                                             </td>
-                                            <td style="padding: 14px 0; border-bottom: 1px solid #293548; font-size: 14px; color: #e2e8f0; text-align: right; font-weight: bold;">
+                                            <td style="padding: 14px 0; border-bottom: 1px solid #2e2640; font-size: 14px; color: #f5a623; text-align: right; font-weight: bold;">
                                                 {{ sous_total|number_format(2, ',', ' ') }} €
                                             </td>
                                         </tr>
@@ -91,7 +91,7 @@
                                 <tr>
                                     <td style="padding-top: 16px; font-size: 16px; color: #ffffff; font-weight: bold; text-align: right;">
                                         Total&nbsp;:
-                                        <span style="color: #22d3ee;">
+                                        <span style="color: #f5a623;">
                                             {{ total_general|number_format(2, ',', ' ') }} €
                                         </span>
                                     </td>
@@ -103,22 +103,22 @@
                     {# Séparateur #}
                     <tr>
                         <td style="padding: 0 40px;">
-                            <div style="border-top: 1px solid #334155;"></div>
+                            <div style="border-top: 1px solid #2e2640;"></div>
                         </td>
                     </tr>
 
                     {# Message de fin #}
                     <tr>
                         <td style="padding: 24px 40px 32px;">
-                            <p style="margin: 0 0 16px; font-size: 14px; color: #94a3b8; line-height: 1.6;">
+                            <p style="margin: 0 0 16px; font-size: 14px; color: #b9b0cc; line-height: 1.6;">
                                 Vous pouvez retrouver le détail de cette commande à tout moment depuis votre espace personnel.
                             </p>
 
                             <table role="presentation" cellpadding="0" cellspacing="0">
                                 <tr>
-                                    <td style="border-radius: 8px; background-color: #06b6d4;">
+                                    <td style="border-radius: 6px; background-color: #ffffff;">
                                         <a href="#"
-                                           style="display: inline-block; padding: 12px 28px; font-size: 14px; font-weight: bold; color: #0f172a; text-decoration: none;">
+                                           style="display: inline-block; padding: 12px 28px; font-size: 14px; font-weight: bold; color: #111111; text-decoration: none;">
                                             Voir mes commandes
                                         </a>
                                     </td>
@@ -129,9 +129,9 @@
 
                     {# Footer #}
                     <tr>
-                        <td style="background-color: #0f172a; padding: 24px 40px; text-align: center; border-top: 1px solid #334155;">
-                            <p style="margin: 0; font-size: 12px; color: #64748b;">
-                                Merci de votre confiance — l'équipe du site
+                        <td style="background-color: #110d1b; padding: 24px 40px; text-align: center; border-top: 1px solid #2e2640;">
+                            <p style="margin: 0; font-size: 12px; color: #8a82a0;">
+                                Merci de votre confiance — l'équipe Replay
                             </p>
                         </td>
                     </tr>

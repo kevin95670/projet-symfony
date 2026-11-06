@@ -5,27 +5,29 @@
 {% block body %}
 
 {# Bandeau d'accueil #}
-<div class="relative overflow-hidden border-b border-slate-800">
+<div class="relative overflow-hidden border-b border-[#2e2640] bg-gradient-to-br from-[#3b1d5c]/40 via-[#4a1d2e]/30 to-[#1e3a5f]/30">
 
     {# Halo décoratif #}
-    <div class="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-cyan-500/10 rounded-full blur-3xl pointer-events-none"></div>
+    <div class="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-[#f5a623]/10 rounded-full blur-3xl pointer-events-none"></div>
 
     <div class="relative max-w-7xl mx-auto px-4 py-20 text-center">
 
+        <span class="inline-block bg-[#f5a623] text-[#111] text-xs font-bold px-3 py-1 rounded-sm mb-6">Nouveauté</span>
+
         <h1 class="text-4xl md:text-5xl font-bold text-white leading-tight mb-6">
             Vos jeux méritent<br class="hidden sm:block">
-            <span class="text-cyan-400">une seconde partie</span>
+            <span class="text-[#f5a623]">une seconde partie</span>
         </h1>
 
-        <p class="text-lg text-slate-400 max-w-2xl mx-auto leading-relaxed mb-10">
+        <p class="text-lg text-[#b9b0cc] max-w-2xl mx-auto leading-relaxed mb-10">
             Achetez et revendez vos jeux entre joueurs. Pas d'intermédiaire, des prix justes, et des titres qui retrouvent une manette.
         </p>
 
         <div class="flex flex-col sm:flex-row gap-4 justify-center mb-14">
-            <a href="#" class="bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-semibold py-3 px-8 rounded-lg transition">
+            <a href="#" class="bg-white hover:bg-[#f5a623] text-[#111] font-bold text-sm py-3 px-8 rounded-md transition">
                 Parcourir les annonces
             </a>
-            <a href="#" class="border border-slate-700 hover:border-slate-500 text-slate-300 hover:text-white font-medium py-3 px-8 rounded-lg transition">
+            <a href="#" class="border border-[#f5a623] hover:bg-[#f5a623] hover:text-[#111] text-[#f5a623] font-semibold text-sm py-3 px-8 rounded-md transition">
                 Vendre un jeu
             </a>
         </div>
@@ -34,15 +36,15 @@
         <div class="flex justify-center gap-12 sm:gap-20">
             <div>
                 <div class="text-3xl font-bold text-white">{{ nb_annonces }}</div>
-                <div class="text-xs text-slate-500 uppercase tracking-wider mt-1">Annonces</div>
+                <div class="text-xs text-[#8a82a0] uppercase tracking-wider mt-1">Annonces</div>
             </div>
             <div>
                 <div class="text-3xl font-bold text-white">{{ nb_membres }}</div>
-                <div class="text-xs text-slate-500 uppercase tracking-wider mt-1">Membres</div>
+                <div class="text-xs text-[#8a82a0] uppercase tracking-wider mt-1">Membres</div>
             </div>
             <div>
                 <div class="text-3xl font-bold text-white">{{ nb_categories }}</div>
-                <div class="text-xs text-slate-500 uppercase tracking-wider mt-1">Catégories</div>
+                <div class="text-xs text-[#8a82a0] uppercase tracking-wider mt-1">Catégories</div>
             </div>
         </div>
 
@@ -51,10 +53,10 @@
 
 {# Catégories #}
 <div class="max-w-7xl mx-auto px-4 pt-12">
-    <h2 class="text-sm font-medium text-slate-500 uppercase tracking-wider mb-4">Explorer par catégorie</h2>
+    <h2 class="text-sm font-medium text-[#8a82a0] uppercase tracking-wider mb-4">Explorer par catégorie</h2>
     <div class="flex flex-wrap gap-2">
         {% for categorie in categories %}
-            <a href="{{ path('app_jeux_par_categorie', {'slug': categorie.slug}) }}" class="px-4 py-2 text-sm rounded-full bg-slate-900 border border-slate-800 text-slate-300 hover:border-cyan-500 hover:text-cyan-400 transition">
+            <a href="{{ path('app_jeux_par_categorie', {'slug': categorie.slug}) }}" class="px-4 py-2 text-sm rounded-full bg-[#1c1628] border border-[#2e2640] text-[#b9b0cc] hover:border-[#f5a623] hover:text-[#f5a623] transition">
                 {{ categorie.nom }}
             </a>
         {% endfor %}
@@ -66,7 +68,7 @@
 
     <div class="flex items-baseline justify-between mb-6">
         <h2 class="text-2xl font-bold text-white">Dernières annonces</h2>
-        <a href="#" class="text-sm text-slate-400 hover:text-white transition">Voir tout →</a>
+        <a href="#" class="text-sm text-[#b9b0cc] hover:text-[#f5a623] transition">Voir tout →</a>
     </div>
 
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -85,7 +87,7 @@
 
     <div class="flex items-baseline justify-between mb-6">
         <h2 class="text-2xl font-bold text-white">Jeux petits budgets</h2>
-        <a href="#" class="text-sm text-slate-400 hover:text-white transition">Voir tout →</a>
+        <a href="#" class="text-sm text-[#b9b0cc] hover:text-[#f5a623] transition">Voir tout →</a>
     </div>
 
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

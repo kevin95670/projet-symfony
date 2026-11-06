@@ -12,28 +12,28 @@
                 Commande {% if commande.reference is defined and commande.reference %}#{{ commande.reference }}{% else %}#{{ commande.id }}{% endif %}
             </h1>
             {% if commande.dateCommande is defined and commande.dateCommande %}
-                <p class="text-sm text-slate-400 mt-1">
+                <p class="text-sm text-[#8a82a0] mt-1">
                     Passée le {{ commande.dateCommande|date('d/m/Y à H:i') }}
                 </p>
             {% endif %}
         </div>
 
-        <div class="w-12 h-12 rounded-lg bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center shrink-0">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 text-cyan-400">
+        <div class="w-12 h-12 rounded-md bg-[#f5a623]/10 border border-[#f5a623]/40 flex items-center justify-center shrink-0">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 text-[#f5a623]">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M9 14.25l6-6m4.5-3.493V21.75l-3.75-1.5-3.75 1.5-3.75-1.5-3.75 1.5V4.757c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0111.186 0c1.1.128 1.907 1.077 1.907 2.185z" />
             </svg>
         </div>
     </div>
 
     {# Liste des articles #}
-    <div class="bg-slate-900 border border-slate-800 rounded-xl overflow-hidden mb-6">
-        <div class="px-6 py-4 border-b border-slate-800">
+    <div class="bg-[#1c1628] border border-[#2e2640] rounded-lg overflow-hidden mb-6">
+        <div class="px-6 py-4 border-b border-[#2e2640]">
             <h2 class="font-semibold text-white">
                 {{ commande.commandeLignes|length }} article{{ commande.commandeLignes|length > 1 ? 's' : '' }}
             </h2>
         </div>
 
-        <ul class="divide-y divide-slate-800">
+        <ul class="divide-y divide-[#2e2640]">
             {% set total = 0 %}
             {% for ligne in commande.commandeLignes %}
                 {% set sousTotal = ligne.prixUnitaire * ligne.quantite %}
@@ -41,11 +41,11 @@
 
                 <li class="flex items-center gap-4 px-6 py-5">
 
-                    <div class="w-16 h-16 rounded-lg bg-slate-800 overflow-hidden shrink-0 border border-slate-700">
+                    <div class="w-16 h-16 rounded-md bg-[#2a2040] overflow-hidden shrink-0 border border-[#2e2640]">
                         {% if ligne.jeu.image %}
                             <img src="{{ ligne.jeu.image }}" alt="{{ ligne.jeu.titre }}" class="w-full h-full object-cover">
                         {% else %}
-                            <div class="w-full h-full flex items-center justify-center text-slate-600">
+                            <div class="w-full h-full flex items-center justify-center text-[#5d5573]">
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 0 0 1.5-1.5V6a1.5 1.5 0 0 0-1.5-1.5H3.75A1.5 1.5 0 0 0 2.25 6v12a1.5 1.5 0 0 0 1.5 1.5Zm10.5-11.25h.008v.008h-.008V8.25Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z" />
                                 </svg>
@@ -55,28 +55,28 @@
 
                     <div class="flex-1 min-w-0">
                         <p class="font-medium text-white truncate">{{ ligne.jeu.titre }}</p>
-                        <p class="text-sm text-slate-400 mt-0.5">
+                        <p class="text-sm text-[#8a82a0] mt-0.5">
                             {{ ligne.prixUnitaire|number_format(2, ',', ' ') }} € × {{ ligne.quantite }}
                         </p>
                     </div>
 
                     <div class="text-right shrink-0">
-                        <p class="font-semibold text-white">{{ sousTotal|number_format(2, ',', ' ') }} €</p>
+                        <p class="font-bold text-[#f5a623]">{{ sousTotal|number_format(2, ',', ' ') }} €</p>
                     </div>
 
                 </li>
             {% endfor %}
         </ul>
 
-        <div class="px-6 py-4 bg-slate-950/40 border-t border-slate-800 flex justify-between items-center">
-            <span class="text-slate-400 font-medium">Total</span>
-            <span class="text-xl font-bold text-white">{{ total|number_format(2, ',', ' ') }} €</span>
+        <div class="px-6 py-4 bg-[#110d1b] border-t border-[#2e2640] flex justify-between items-center">
+            <span class="text-[#b9b0cc] font-medium">Total</span>
+            <span class="text-xl font-bold text-[#f5a623]">{{ total|number_format(2, ',', ' ') }} €</span>
         </div>
     </div>
 
     {# Retour #}
     <div class="text-center">
-        <a href="{{ path('app_commandes') }}" class="inline-flex items-center gap-2 text-slate-400 hover:text-white transition text-sm">
+        <a href="{{ path('app_commandes') }}" class="inline-flex items-center gap-2 text-[#b9b0cc] hover:text-[#f5a623] transition text-sm">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18" />
             </svg>
