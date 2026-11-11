@@ -7,7 +7,11 @@ use App\Entity\User;
 use App\Entity\Panier;
 use App\Entity\Commande;
 use App\Entity\CommandeLignes;
+use App\Entity\WishlistItem;
+use App\Enum\JeuStatut;
+use App\Exception\JeuIndisponibleException;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\DBAL\LockMode;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -19,31 +23,6 @@ class PanierRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, Panier::class);
     }
-
-    //    /**
-    //     * @return Panier[] Returns an array of Panier objects
-    //     */
-    //    public function findByExampleField($value): array
-    //    {
-    //        return $this->createQueryBuilder('p')
-    //            ->andWhere('p.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->orderBy('p.id', 'ASC')
-    //            ->setMaxResults(10)
-    //            ->getQuery()
-    //            ->getResult()
-    //        ;
-    //    }
-
-    //    public function findOneBySomeField($value): ?Panier
-    //    {
-    //        return $this->createQueryBuilder('p')
-    //            ->andWhere('p.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->getQuery()
-    //            ->getOneOrNullResult()
-    //        ;
-    //    }
 
     public function viderPanier(Panier $panier): void {
         $entityManager = $this->getEntityManager();
@@ -71,34 +50,68 @@ class PanierRepository extends ServiceEntityRepository
         return $panier;
     }
 
-    public function checkout(Panier $panier): Commande
+    // Crée la commande. Lève JeuIndisponibleException si un jeu n'est plus en vente.
+    // $livraison : adresse saisie chez Stripe (peut être null)
+    public function checkout(Panier $panier, ?array $livraison = null): Commande
     {
-        $commande = new Commande();
-        $commande->setUser($panier->getUser());
-        $commande->setDateCommande(new \DateTimeImmutable());
-        $commande->setStatut('payée');
-        $commande->setReference(uniqid('CMD-'));
+        $em = $this->getEntityManager();
+        $acheteur = $panier->getUser();
 
-        foreach ($panier->getPanierItems() as $panierItem) {
-            $commandeItem = new CommandeLignes();
-            $commandeItem->setCommande($commande);
-            $commandeItem->setJeu($panierItem->getJeu());
-            $commandeItem->setQuantite($panierItem->getQuantite());
-            $commandeItem->setPrixUnitaire($panierItem->getJeu()->getPrix()); // fige le prix au moment de l'achat
+        // Tout se passe dans une transaction : si une erreur survient, rien n'est enregistré
+        return $em->wrapInTransaction(function () use ($em, $panier, $acheteur, $livraison) {
 
-            $commande->addCommandeLigne($commandeItem);
-            $this->getEntityManager()->persist($commandeItem);
-        }
+            // Verrouille chaque jeu : deux paiements simultanés ne peuvent pas vendre le même jeu
+            foreach ($panier->getPanierItems() as $panierItem) {
+                $jeu = $panierItem->getJeu();
+                $em->lock($jeu, LockMode::PESSIMISTIC_WRITE);
+                $em->refresh($jeu); // on relit le statut depuis la base, après le verrou
 
-        $this->getEntityManager()->persist($commande);
+                if ($jeu->getStatut() !== JeuStatut::EN_VENTE) {
+                    throw new JeuIndisponibleException($jeu);
+                }
+            }
 
-        // Vide le panier après la commande
-        foreach ($panier->getPanierItems() as $panierItem) {
-            $this->getEntityManager()->remove($panierItem);
-        }
+            $commande = new Commande();
+            $commande->setUser($acheteur);
+            $commande->setDateCommande(new \DateTimeImmutable());
+            $commande->setStatut('payée');
+            $commande->setReference(uniqid('CMD-'));
+            $commande->setLivraison($livraison);
 
-        $this->getEntityManager()->flush();
+            foreach ($panier->getPanierItems() as $panierItem) {
+                $commandeItem = new CommandeLignes();
+                $commandeItem->setCommande($commande);
+                $commandeItem->setJeu($panierItem->getJeu());
+                $commandeItem->setQuantite($panierItem->getQuantite());
+                $commandeItem->setPrixUnitaire($panierItem->getJeu()->getPrix()); // fige le prix au moment de l'achat
 
-        return $commande;
+                $commande->addCommandeLigne($commandeItem);
+                $em->persist($commandeItem);
+            }
+
+            // Le jeu est vendu : il ne doit plus apparaître comme disponible
+            foreach ($panier->getPanierItems() as $panierItem) {
+                $jeu = $panierItem->getJeu();
+                $jeu->setStatut(JeuStatut::VENDU);
+
+                // Retirer le jeu de la wishlist de l'acheteur
+                // (les paniers des autres acheteurs gardent le jeu, affiché comme « Vendu » et non payable)
+                $wishlistItems = $em->getRepository(WishlistItem::class)->findBy(['user' => $acheteur, 'jeu' => $jeu]);
+                foreach ($wishlistItems as $wishlistItem) {
+                    $em->remove($wishlistItem);
+                }
+            }
+
+            $em->persist($commande);
+
+            // Vide le panier de l'acheteur après la commande
+            foreach ($panier->getPanierItems() as $panierItem) {
+                $em->remove($panierItem);
+            }
+
+            $em->flush();
+
+            return $commande;
+        });
     }
 }

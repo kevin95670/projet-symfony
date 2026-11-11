@@ -7,22 +7,18 @@ use App\Repository\PanierRepository;
 use App\Entity\Jeu;
 use App\Repository\JeuRepository;
 use App\Repository\PromoCodeRepository;
-use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use App\Service\CartMerger;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
-use Symfony\Component\Mailer\MailerInterface;
-use Symfony\Component\Mime\Address;
-use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 
 final class CartController extends AbstractController
 {
     public function __construct(private CartMerger $cartMerger) {}
 
     #[Route('/cart', name: 'app_cart')]
-    public function index(Request $request, JeuRepository $jeuRepository, PromoCodeRepository $promoRepository): Response
+    public function index(Request $request, JeuRepository $jeuRepository, PromoCodeRepository $promoRepository, PanierRepository $panierRepository): Response
     {
         /** @var \App\Entity\User|null $user */
         $user = $this->getUser();
@@ -38,14 +34,17 @@ final class CartController extends AbstractController
         if ($user) {
             $this->cartMerger->mergeSessionCartIfNeeded($user);
 
-            foreach ($user->getPanier()->getPanierItems() as $panierItem) {
+            // Le panier existe toujours, même si le compte n'en avait pas encore
+            $panier = $panierRepository->findOrCreateForUser($user);
+
+            foreach ($panier->getPanierItems() as $panierItem) {
                 $items[] = [
                     'panierItem' => $panierItem,
                     'jeu' => $panierItem->getJeu(),
                     'quantity' => $panierItem->getQuantite(),
                 ];
             }
-            $jeux = $items ?? [];
+            $jeux = $items;
         } else {
             $cart = $request->getSession()->get('cart', []);
 
@@ -58,19 +57,21 @@ final class CartController extends AbstractController
                     ];
                 }
             }
-            $jeux = $items ?? [];
+            $jeux = $items;
         }
 
-        // Calcule le total
+        // Calcule le total (les jeux vendus ne comptent pas)
         $total = 0;
         foreach ($jeux as $item) {
-            $total += $item['jeu']->getPrix() * $item['quantity'];
+            if ($item['jeu']->getStatut()->name === 'EN_VENTE') {
+                $total += $item['jeu']->getPrix() * $item['quantity'];
+            }
         }
 
         // Si un code promo est appliqué
         if ($appliedPromoCode) {
             $promoCode = $promoRepository->findOneBy(['code' => $appliedPromoCode]);
-            
+
             if ($promoCode && $promoCode->getDateExpiration() > new \DateTime() && $promoCode->isActif()) {
                 $promoApplied = true;
                 $discount = $total * ($promoCode->getPourcentage() / 100);
@@ -93,7 +94,7 @@ final class CartController extends AbstractController
         $promoCode = $request->request->get('promo_code');
         $request->getSession()->remove('promo_code'); // Supprime le code promo précédent avant d'appliquer le nouveau
         $promo = $promoRepository->findOneBy(['code' => $promoCode]);
-        
+
         if (!$promo) {
             $this->addFlash('error', 'Code promo invalide');
         } elseif ($promo->getDateExpiration() < new \DateTime()) {
@@ -104,7 +105,7 @@ final class CartController extends AbstractController
             $request->getSession()->set('promo_code', $promoCode);
             $this->addFlash('success', 'Code promo appliqué !');
         }
-        
+
         return $this->redirectToRoute('app_cart');
     }
 
@@ -163,6 +164,7 @@ final class CartController extends AbstractController
     public function removeFromCart(
         Request $request,
         PanierItemRepository $cartRepository,
+        PanierRepository $panierRepository,
         int $id
     ): Response {
         /** @var \App\Entity\User|null $user */
@@ -171,7 +173,8 @@ final class CartController extends AbstractController
         if ($user) {
             $this->cartMerger->mergeSessionCartIfNeeded($user);
 
-            $cartRepository->deleteFromCart($user->getPanier()->getId(), $id);
+            $panier = $panierRepository->findOrCreateForUser($user);
+            $cartRepository->deleteFromCart($panier->getId(), $id);
             $this->addFlash('success', 'Retiré du panier.');
         } else {
             $session = $request->getSession();
@@ -185,40 +188,14 @@ final class CartController extends AbstractController
         return $this->redirect($request->headers->get('referer') ?? $this->generateUrl('app_home'));
     }
 
+    // Ancienne validation directe, sans paiement : elle est remplacée par Stripe Checkout (/panier/payer).
+    // Elle ne crée plus aucune commande.
     #[Route('/panier/checkout', name: 'app_cart_checkout', methods: ['POST'])]
-    public function checkout(
-        Request $request,
-        PanierRepository $cartRepository,
-        MailerInterface $mailer
-    ): Response {
-        /** @var \App\Entity\User|null $user */
-        $user = $this->getUser();
+    public function checkout(): Response
+    {
+        $this->addFlash('error', 'Pour valider ta commande, passe par le paiement sécurisé.');
 
-        if (!$user) {
-            $this->addFlash('error', 'Vous devez être connecté pour passer la commande.');
-            return $this->redirectToRoute('app_login', ['redirect' => $this->generateUrl('app_cart')]);
-        }
-
-        $commande = $cartRepository->checkout($user->getPanier());
-        try {
-            $email = (new TemplatedEmail())
-            ->from(new Address('kevinleonard.info@gmail.com', 'Kevin'))
-            ->to((string) $user->getEmail())
-            ->subject('Merci pour votre commande !')
-            ->htmlTemplate('commande/commande.html.twig')
-            ->context([
-                'user' => $user,
-                'commande' => $commande
-            ])
-            ;
-
-            $mailer->send($email);
-        } catch (\Exception $e) {
-            $this->addFlash('error', 'Erreur lors de l\'envoi de l\'email de confirmation : ' . $e->getMessage());
-        }
-
-
-        return $this->redirectToRoute('app_commande_confirmation', ['id' => $commande->getId()]);
+        return $this->redirectToRoute('app_cart');
     }
 
     #[Route('/panier/vider', name: 'app_cart_clear')]
@@ -232,11 +209,10 @@ final class CartController extends AbstractController
         if ($user) {
             $this->cartMerger->mergeSessionCartIfNeeded($user);
 
-            $cartRepository->viderPanier($user->getPanier());
+            $cartRepository->viderPanier($cartRepository->findOrCreateForUser($user));
             $this->addFlash('success', 'Panier vidé.');
         } else {
             $session = $request->getSession();
-            $cart = $session->get('cart', []);
 
             $session->remove('cart');
             $this->addFlash('success', 'Panier vidé.');

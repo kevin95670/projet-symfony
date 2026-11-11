@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Ton paiement a été remboursé</title>
+</head>
+<body style="margin:0;padding:0;background-color:#0d0a14;font-family:Arial,Helvetica,sans-serif;">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#0d0a14;padding:24px 0;">
+    <tr>
+        <td align="center">
+            <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;background-color:#1c1628;border:1px solid #2e2640;border-radius:8px;">
+                <tr>
+                    <td style="padding:24px 32px;border-bottom:1px solid #2e2640;">
+                        <span style="font-size:22px;font-weight:bold;color:#ffffff;">RE<span style="color:#f5a623;">PLAY</span></span>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="padding:32px;">
+                        <h1 style="margin:0 0 16px;font-size:20px;color:#ffffff;">Ton paiement a été remboursé</h1>
+                        <p style="margin:0 0 16px;font-size:14px;line-height:1.6;color:#b9b0cc;">
+                            Bonjour {{ user.prenom }},
+                        </p>
+                        <p style="margin:0 0 16px;font-size:14px;line-height:1.6;color:#b9b0cc;">
+                            Nous sommes désolés : <strong style="color:#ffffff;">{{ titre }}</strong> a été vendu à un autre acheteur
+                            au moment de ta commande. Ton paiement a donc été remboursé intégralement.
+                        </p>
+                        <p style="margin:0;font-size:14px;line-height:1.6;color:#b9b0cc;">
+                            Le remboursement peut mettre quelques jours à apparaître sur ton relevé bancaire.
+                        </p>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="padding:16px 32px;border-top:1px solid #2e2640;font-size:12px;color:#8a82a0;">
+                        Replay · Merci pour ta confiance
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+</table>
+</body>
+</html>

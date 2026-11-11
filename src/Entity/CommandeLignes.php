@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Enum\StatutLigne;
 use App\Repository\CommandeLignesRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
@@ -27,6 +28,14 @@ class CommandeLignes
     #[ORM\ManyToOne(inversedBy: 'commandeLignes')]
     #[ORM\JoinColumn(nullable: false)]
     private ?Commande $commande = null;
+
+    // Statut de l'envoi de ce jeu (chaque vendeur gère ses propres lignes)
+    #[ORM\Column(enumType: StatutLigne::class, options: ['default' => 'en_preparation'])]
+    private StatutLigne $statut = StatutLigne::EN_PREPARATION;
+
+    // Numéro de suivi saisi par le vendeur à l'expédition
+    #[ORM\Column(length: 100, nullable: true)]
+    private ?string $numeroSuivi = null;
 
     public function getId(): ?int
     {
@@ -77,6 +86,30 @@ class CommandeLignes
     public function setCommande(?Commande $commande): static
     {
         $this->commande = $commande;
+
+        return $this;
+    }
+
+    public function getStatut(): StatutLigne
+    {
+        return $this->statut;
+    }
+
+    public function setStatut(StatutLigne $statut): static
+    {
+        $this->statut = $statut;
+
+        return $this;
+    }
+
+    public function getNumeroSuivi(): ?string
+    {
+        return $this->numeroSuivi;
+    }
+
+    public function setNumeroSuivi(?string $numeroSuivi): static
+    {
+        $this->numeroSuivi = $numeroSuivi;
 
         return $this;
     }

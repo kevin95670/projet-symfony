@@ -80,7 +80,7 @@
 
                     <div class="aspect-4/3 bg-[#2a2040] overflow-hidden">
                         {% if jeu.image %}
-                            <img src="{{ jeu.image }}" alt="{{ jeu.titre }}"
+                            <img src="{{ jeu.image }}" alt="{{ jeu.titre }}" loading="lazy"
                                  class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
                         {% else %}
                             <div class="w-full h-full flex items-center justify-center text-[#5d5573] text-sm">

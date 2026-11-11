@@ -5,6 +5,7 @@ namespace App\Entity;
 use App\Repository\CommandeRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: CommandeRepository::class)]
@@ -27,6 +28,10 @@ class Commande
 
     #[ORM\Column(length: 255)]
     private ?string $reference = null;
+
+    // Adresse de livraison saisie chez Stripe : nom, ligne1, ligne2, code_postal, ville, pays
+    #[ORM\Column(type: Types::JSON, nullable: true)]
+    private ?array $livraison = null;
 
     /**
      * @var Collection<int, CommandeLignes>
@@ -95,6 +100,18 @@ class Commande
     public function setReference(string $reference): static
     {
         $this->reference = $reference;
+
+        return $this;
+    }
+
+    public function getLivraison(): ?array
+    {
+        return $this->livraison;
+    }
+
+    public function setLivraison(?array $livraison): static
+    {
+        $this->livraison = $livraison;
 
         return $this;
     }

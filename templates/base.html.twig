@@ -62,6 +62,21 @@
                                 </div>
                             </form>
 
+                            {# Notifications #}
+                            {% if app.user %}
+                                <a href="{{ path('app_notifications') }}" class="relative text-[#b9b0cc] hover:text-[#f5a623] transition" title="Notifications">
+                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.4-1.4A2 2 0 0118 14.2V11a6 6 0 10-12 0v3.2a2 2 0 01-.6 1.4L4 17h5m6 0a3 3 0 11-6 0m6 0H9" />
+                                    </svg>
+                                    {% set nonLues = notifications_non_lues() %}
+                                    {% if nonLues > 0 %}
+                                        <span class="absolute -top-2 -right-2 bg-[#f5a623] text-[#111] text-xs font-bold rounded-full min-w-5 h-5 px-1 flex items-center justify-center">
+                                            {{ nonLues }}
+                                        </span>
+                                    {% endif %}
+                                </a>
+                            {% endif %}
+
                             {# Panier - toujours visible #}
                             <a href="{{ path('app_cart') }}" class="relative text-[#b9b0cc] hover:text-[#f5a623] transition" title="Panier">
                                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">

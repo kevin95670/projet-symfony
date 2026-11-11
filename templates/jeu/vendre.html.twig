@@ -73,9 +73,10 @@
             </div>
 
             <div>
-                {{ form_label(form.image, null, {'label_attr': {'class': 'block text-sm text-[#b9b0cc] mb-1'}}) }}
-                {{ form_widget(form.image, {'attr': {'class': 'w-full bg-[#110d1b] border border-[#2e2640] text-white text-sm rounded-md px-3 py-2 placeholder-[#5d5573] focus:outline-none focus:border-[#f5a623]', 'placeholder': 'https://...'}}) }}
-                {{ form_errors(form.image) }}
+                {{ form_label(form.imageFichier, null, {'label_attr': {'class': 'block text-sm text-[#b9b0cc] mb-1'}}) }}
+                {{ form_widget(form.imageFichier, {'attr': {'class': 'w-full text-sm text-[#b9b0cc] file:mr-3 file:py-2 file:px-3 file:rounded-md file:border-0 file:bg-[#2a2040] file:text-white hover:file:bg-[#f5a623] hover:file:text-[#111] file:transition'}}) }}
+                <p class="text-xs text-[#5d5573] mt-1">JPG, PNG ou WebP, 2 Mo maximum.</p>
+                {{ form_errors(form.imageFichier) }}
             </div>
 
             <button type="submit" class="w-full bg-white hover:bg-[#f5a623] text-[#111] font-bold text-sm py-3 px-6 rounded-md transition">

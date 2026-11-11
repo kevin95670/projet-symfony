@@ -45,8 +45,11 @@
                 <ul class="divide-y divide-[#2e2640]">
                     {% set total = 0 %}
                     {% for item in jeux %}
-                        {% set total = total + (item.jeu.prix * item.quantity) %}
-                        {% set isModified = item.panierItem and item.jeu.getMiseAJour() and item.jeu.getMiseAJour() > item.panierItem.getMiseAJour() %}
+                        {# Un jeu vendu reste visible mais ne compte pas dans le total #}
+                        {% if item.jeu.statut.name == 'EN_VENTE' %}
+                            {% set total = total + (item.jeu.prix * item.quantity) %}
+                        {% endif %}
+                        {% set isModified = item.panierItem is defined and item.panierItem and item.jeu.getMiseAJour() and item.jeu.getMiseAJour() > item.panierItem.getMiseAJour() %}
 
                         <li class="flex flex-col gap-4 p-6">
                             <!-- Alerte si modifié -->
@@ -59,6 +62,13 @@
                                         <p class="font-medium">Ce jeu a été modifié depuis son ajout au panier</p>
                                         <p class="text-sm mt-1 text-[#b9b0cc]">Vérifie que les informations te conviennent toujours</p>
                                     </div>
+                                </div>
+                            {% endif %}
+
+                            <!-- Alerte si vendu -->
+                            {% if item.jeu.statut.name != 'EN_VENTE' %}
+                                <div class="bg-[#ff8a80]/10 border border-[#ff8a80]/40 text-[#ff8a80] rounded-md px-4 py-3 text-sm font-medium">
+                                    Ce jeu est vendu. Il sera retiré de ton panier au moment du paiement.
                                 </div>
                             {% endif %}
 
@@ -139,7 +149,7 @@
                         </div>
                     </div>
 
-                    <form action="{{ path('app_cart_checkout') }}" method="post">
+                    <form action="{{ path('app_stripe_checkout') }}" method="post">
                         <button type="submit" class="w-full bg-white hover:bg-[#f5a623] text-[#111] font-bold text-sm py-3 rounded-md transition">
                             Valider la commande
                         </button>

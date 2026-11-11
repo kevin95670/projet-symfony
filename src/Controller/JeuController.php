@@ -16,7 +16,10 @@ use App\Repository\JeuCommentRepository;
 use Symfony\Component\String\Slugger\AsciiSlugger;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\File\Exception\FileException;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Routing\Attribute\Route;
 
 final class JeuController extends AbstractController
@@ -93,13 +96,20 @@ final class JeuController extends AbstractController
             throw $this->createAccessDeniedException('Vous ne pouvez pas modifier ce jeu.');
         }
 
+        if ($jeu->getStatut() === \App\Enum\JeuStatut::VENDU) {
+            $this->addFlash('error', 'Un jeu vendu ne peut plus être modifié.');
+            return $this->redirectToRoute('app_ventes', ['vendeurId' => $user->getId()]);
+        }
+
         $form = $this->createForm(JeuEditType::class, $jeu);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $em->flush();
-
+            // Nouvelle photo : on la remplace seulement si l'utilisateur en a envoyé une
+            $this->enregistrerPhoto($form, $jeu);
             $jeu->setMiseAJour(new \DateTimeImmutable());
+
+            $em->flush();
 
             $this->addFlash('success', 'Jeu mis à jour avec succès.');
             return $this->redirectToRoute('app_ventes', ['vendeurId' => $user->getId()]);
@@ -147,6 +157,9 @@ final class JeuController extends AbstractController
             $jeu->setSlug($slugger->slug($jeu->getTitre())->lower()->toString());
             $jeu->setStatut(\App\Enum\JeuStatut::EN_VENTE);
 
+            // Photo envoyée depuis l'ordinateur, si elle existe
+            $this->enregistrerPhoto($form, $jeu);
+
             $em->persist($jeu);
             $em->flush();
 
@@ -174,6 +187,11 @@ final class JeuController extends AbstractController
             throw $this->createAccessDeniedException('Vous ne pouvez pas accéder aux ventes d\'un autre utilisateur.');
         }
 
+        if ($jeu->getStatut() === \App\Enum\JeuStatut::VENDU) {
+            $this->addFlash('error', 'Un jeu vendu ne peut plus être supprimé : il est lié à une commande.');
+            return $this->redirectToRoute('app_ventes', ['vendeurId' => $user->getId()]);
+        }
+
         $em->remove($jeu);
         $em->flush();
 
@@ -182,7 +200,7 @@ final class JeuController extends AbstractController
         return $this->redirectToRoute('app_ventes', ['vendeurId' => $vendeurId]);
     }
 
-    #[Route('/ventes/{vendeurId}', name: 'app_ventes')]
+    #[Route('/ventes/{vendeurId}', name: 'app_ventes', requirements: ['vendeurId' => '\d+'])]
     #[IsGranted('ROLE_USER')]
     public function ventes(int $vendeurId, JeuRepository $jeuRepository): Response
     {
@@ -199,5 +217,33 @@ final class JeuController extends AbstractController
         return $this->render('jeu/ventes.html.twig', [
             'ventes' => $ventes,
         ]);
+    }
+
+    /**
+     * Déplace la photo envoyée dans public/uploads/jeux/ et enregistre son chemin dans $jeu->image.
+     * Ne fait rien si aucune photo n'a été envoyée : l'image actuelle est alors conservée.
+     */
+    private function enregistrerPhoto(FormInterface $form, Jeu $jeu): void
+    {
+        /** @var UploadedFile|null $fichier */
+        $fichier = $form->get('imageFichier')->getData();
+
+        if (!$fichier) {
+            return;
+        }
+
+        // Nom unique pour éviter d'écraser une autre photo
+        $nom = bin2hex(random_bytes(8)) . '.' . $fichier->guessExtension();
+        $dossier = $this->getParameter('kernel.project_dir') . '/public/uploads/jeux';
+
+        try {
+            $fichier->move($dossier, $nom);
+        } catch (FileException) {
+            $this->addFlash('danger', 'La photo n\'a pas pu être enregistrée. Réessaie.');
+            return;
+        }
+
+        // Chemin public, utilisable directement dans <img src="...">
+        $jeu->setImage('/uploads/jeux/' . $nom);
     }
 }

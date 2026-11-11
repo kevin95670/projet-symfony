@@ -109,21 +109,22 @@
             </p>
         </div>
 
-        <!-- Image URL -->
+        <!-- Photo -->
         <div>
-            {{ form_label(form.image, 'Image (URL)', {'label_attr': {'class': 'block text-sm font-medium text-[#b9b0cc] mb-2'}}) }}
-            {{ form_widget(form.image, {'attr': {'class': 'w-full px-4 py-2.5 bg-[#110d1b] border border-[#2e2640] rounded-md text-white placeholder-[#5d5573] focus:outline-none focus:border-[#f5a623] focus:ring-1 focus:ring-[#f5a623] transition', 'placeholder': 'https://exemple.com/image.jpg'}}) }}
-            {% if form.image.vars.errors %}
+            {{ form_label(form.imageFichier, 'Photo du jeu', {'label_attr': {'class': 'block text-sm font-medium text-[#b9b0cc] mb-2'}}) }}
+            {{ form_widget(form.imageFichier, {'attr': {'class': 'w-full text-sm text-[#b9b0cc] file:mr-3 file:py-2 file:px-3 file:rounded-md file:border-0 file:bg-[#2a2040] file:text-white hover:file:bg-[#f5a623] hover:file:text-[#111] file:transition'}}) }}
+            <p class="text-xs text-[#5d5573] mt-1">JPG, PNG ou WebP, 2 Mo maximum. Laisse vide pour garder la photo actuelle.</p>
+            {% if form.imageFichier.vars.errors %}
                 <div class="mt-1 text-sm text-[#ff8a80]">
-                    {{ form_errors(form.image) }}
+                    {{ form_errors(form.imageFichier) }}
                 </div>
             {% endif %}
 
-            <!-- Aperçu de l'image actuelle -->
+            <!-- Aperçu de la photo actuelle -->
             {% if jeu.image %}
                 <div class="mt-4">
                     <p class="text-sm font-medium text-[#b9b0cc] mb-3">Aperçu actuel :</p>
-                    <img src="{{ jeu.image }}" alt="Aperçu du jeu" class="max-w-xs h-auto rounded-md border border-[#2e2640]">
+                    <img src="{{ jeu.image }}" alt="Aperçu du jeu" loading="lazy" class="max-w-xs h-auto rounded-md border border-[#2e2640]">
                 </div>
             {% endif %}
         </div>

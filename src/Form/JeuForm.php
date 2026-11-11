@@ -14,7 +14,8 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\MoneyType;
-use Symfony\Component\Form\Extension\Core\Type\UrlType;
+use Symfony\Component\Form\Extension\Core\Type\FileType;
+use Symfony\Component\Validator\Constraints\File;
 
 class JeuForm extends AbstractType
 {
@@ -43,9 +44,18 @@ class JeuForm extends AbstractType
                 'expanded' => true,
                 'label' => 'Catégories',
             ])
-            ->add('image', UrlType::class, [
+            // Photo envoyée depuis l'ordinateur : pas liée à l'entité, le contrôleur la déplace
+            ->add('imageFichier', FileType::class, [
+                'mapped' => false,
                 'required' => false,
-                'label' => 'URL de l\'image (optionnel)',
+                'label' => 'Photo du jeu (optionnel)',
+                'constraints' => [
+                    new File(
+                        maxSize: '2M',
+                        mimeTypes: ['image/jpeg', 'image/png', 'image/webp'],
+                        mimeTypesMessage: 'Merci d\'envoyer une image JPG, PNG ou WebP.',
+                    ),
+                ],
             ])
         ;
     }
