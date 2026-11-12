@@ -23,6 +23,11 @@ jobs:
       - name: Installer les dépendances de production
         run: composer install --no-dev --optimize-autoloader --no-interaction --no-scripts
 
+      - name: Générer les assets JavaScript (Stimulus, importmap)
+        run: |
+          php bin/console importmap:install --env=prod
+          php bin/console asset-map:compile --env=prod
+
       - name: Préparer la clé SSH
         env:
           SSH_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
