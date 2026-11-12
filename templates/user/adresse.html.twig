@@ -10,14 +10,6 @@
             Elle est proposée automatiquement sur la page de paiement. Livraison en France uniquement.
         </p>
 
-        {# Messages (succès ou erreur) #}
-        {% for message in app.flashes('success') %}
-            <div class="mb-4 px-4 py-3 rounded-md bg-[#f5a623]/15 border border-[#f5a623]/40 text-sm text-white">{{ message }}</div>
-        {% endfor %}
-        {% for message in app.flashes('error') %}
-            <div class="mb-4 px-4 py-3 rounded-md bg-[#ff8a80]/15 border border-[#ff8a80]/40 text-sm text-white">{{ message }}</div>
-        {% endfor %}
-
         {% if erreurs|length > 0 %}
             <div class="mb-4 px-4 py-3 rounded-md bg-[#ff8a80]/15 border border-[#ff8a80]/40 text-sm text-white">
                 <ul class="list-disc list-inside">

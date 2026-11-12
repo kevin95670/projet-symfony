@@ -13,12 +13,6 @@
             </p>
         </div>
 
-        {% for flash in app.flashes('success') %}
-            <div class="bg-[#9ae6b4]/10 border border-[#9ae6b4]/30 text-[#9ae6b4] text-sm rounded-md px-4 py-3 mb-6">
-                {{ flash }}
-            </div>
-        {% endfor %}
-
         {{ form_start(form, {'attr': {'class': 'bg-[#1c1628] border border-[#2e2640] rounded-lg p-6 space-y-5'}}) }}
 
             <div>

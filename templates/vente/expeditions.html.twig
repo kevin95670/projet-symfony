@@ -12,13 +12,6 @@
         <p class="mt-2 text-[#b9b0cc]">Saisis le numéro de suivi quand tu expédies un jeu. La réception est confirmée par l'acheteur.</p>
     </div>
 
-    {% for flash in app.flashes('success') %}
-        <div class="bg-[#9ae6b4]/10 border border-[#9ae6b4]/30 text-[#9ae6b4] text-sm rounded-md px-4 py-3 mb-6">{{ flash }}</div>
-    {% endfor %}
-    {% for flash in app.flashes('error') %}
-        <div class="bg-[#ff8a80]/10 border border-[#ff8a80]/30 text-[#ff8a80] text-sm rounded-md px-4 py-3 mb-6">{{ flash }}</div>
-    {% endfor %}
-
     {% if lignes|length > 0 %}
         <div class="space-y-4">
             {% for ligne in lignes %}

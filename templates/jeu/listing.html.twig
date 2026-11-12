@@ -7,14 +7,6 @@
 {% block body %}
     <div class="max-w-6xl mx-auto px-4 py-8">
 
-        {# Messages flash (ex. confirmation d'un signalement) #}
-        {% for message in app.flashes('success') %}
-            <div class="mb-6 rounded-md bg-[#9ae6b4]/10 border border-[#9ae6b4]/30 text-[#9ae6b4] px-4 py-3 text-sm">{{ message }}</div>
-        {% endfor %}
-        {% for message in app.flashes('error') %}
-            <div class="mb-6 rounded-md bg-[#ff8a80]/10 border border-[#ff8a80]/30 text-[#ff8a80] px-4 py-3 text-sm">{{ message }}</div>
-        {% endfor %}
-
         {# Filtres #}
         <form method="GET" action="{{ path('app_jeux_liste') }}" class="bg-[#1c1628] border border-[#2e2640] rounded-lg p-5 mb-8">
             {# On garde le terme de recherche si présent, pour qu'il ne se perde pas quand on filtre #}
