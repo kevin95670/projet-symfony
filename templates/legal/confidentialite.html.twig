@@ -1,0 +1,76 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Politique de confidentialité{% endblock %}
+
+{% block body %}
+    <div class="max-w-3xl mx-auto px-4 py-12 text-[#b9b0cc] leading-relaxed">
+
+        <h1 class="text-3xl font-bold text-white mb-2">Politique de confidentialité</h1>
+        <p class="text-sm text-[#8a82a0] mb-10">Dernière mise à jour : 12/11/2026</p>
+
+        <div class="mb-6 rounded-md bg-[#f5a623]/10 border border-[#f5a623]/30 text-[#f5a623] px-4 py-3 text-sm">
+            Brouillon à titre d'exemple : site fictif. Ce texte n'est pas un conseil juridique.
+        </div>
+
+        <section class="mb-8">
+            <h2 class="text-xl font-semibold text-white mb-3">1. Responsable du traitement</h2>
+            <p>Les données personnelles collectées sur Replay sont traitées par Replay Fictif SAS, dont les coordonnées figurent dans les <a href="{{ path('app_mentions') }}" class="text-[#f5a623] hover:text-white underline underline-offset-2">mentions légales</a>. Contact dédié aux données personnelles : dpo@exemple.com.</p>
+        </section>
+
+        <section class="mb-8">
+            <h2 class="text-xl font-semibold text-white mb-3">2. Données collectées</h2>
+            <ul class="list-disc pl-6 space-y-1">
+                <li><strong class="text-white">Compte :</strong> nom d'utilisateur, pseudo, adresse e-mail, mot de passe (stocké sous forme chiffrée).</li>
+                <li><strong class="text-white">Livraison :</strong> nom, adresse postale, code postal, ville et pays, lorsque vous les renseignez.</li>
+                <li><strong class="text-white">Commandes et ventes :</strong> historique des achats, des ventes, des avis et des messages échangés sur les annonces.</li>
+                <li><strong class="text-white">Paiement :</strong> les données bancaires sont saisies et traitées directement par notre prestataire de paiement ; Replay n'y a pas accès.</li>
+                <li><strong class="text-white">Technique :</strong> données de connexion nécessaires au fonctionnement du site (session, sécurité des formulaires).</li>
+            </ul>
+        </section>
+
+        <section class="mb-8">
+            <h2 class="text-xl font-semibold text-white mb-3">3. Finalités et bases légales</h2>
+            <ul class="list-disc pl-6 space-y-1">
+                <li>Créer et gérer votre compte, traiter vos commandes et vos ventes (exécution du contrat).</li>
+                <li>Vous envoyer des notifications liées à votre activité sur le site, par exemple une baisse de prix sur un jeu de votre liste de souhaits (intérêt légitime).</li>
+                <li>Lutter contre les fraudes et les annonces abusives (intérêt légitime).</li>
+                <li>Respecter nos obligations légales, notamment comptables et fiscales.</li>
+            </ul>
+        </section>
+
+        <section class="mb-8">
+            <h2 class="text-xl font-semibold text-white mb-3">4. Destinataires</h2>
+            <p>Vos données sont destinées à l'éditeur du site et à ses sous-traitants strictement nécessaires : l'hébergeur, Hébergeur Exemple SAS, et le prestataire de paiement, Stripe. Lors d'une vente, le vendeur reçoit l'adresse de livraison nécessaire à l'expédition, et l'acheteur reçoit le pseudo du vendeur. Nous ne vendons pas vos données.</p>
+        </section>
+
+        <section class="mb-8">
+            <h2 class="text-xl font-semibold text-white mb-3">5. Durée de conservation</h2>
+            <ul class="list-disc pl-6 space-y-1">
+                <li>Données de compte : pendant toute la durée de votre inscription, puis 3 ans après suppression.</li>
+                <li>Données de commande : 10 ans pour les obligations comptables.</li>
+                <li>Données de livraison : conservées sur votre compte tant que vous ne les supprimez pas.</li>
+            </ul>
+        </section>
+
+        <section class="mb-8">
+            <h2 class="text-xl font-semibold text-white mb-3">6. Vos droits</h2>
+            <p>Conformément au RGPD et à la loi Informatique et Libertés, vous disposez des droits d'accès, de rectification, d'effacement, de limitation, d'opposition et de portabilité de vos données, ainsi que du droit de définir des directives sur leur sort après votre décès. Pour les exercer, écrivez-nous à contact@exemple.com en joignant une preuve d'identité si nécessaire. Vous pouvez également introduire une réclamation auprès de la CNIL (cnil.fr).</p>
+        </section>
+
+        <section class="mb-8">
+            <h2 class="text-xl font-semibold text-white mb-3">7. Cookies</h2>
+            <p>Replay n'utilise pas de cookies publicitaires ni de cookies de suivi. Seuls des cookies techniques sont déposés : le cookie de session, nécessaire à la connexion et au panier, et le jeton de sécurité des formulaires (protection contre les requêtes frauduleuses). Ces cookies sont indispensables au fonctionnement du site et ne nécessitent pas de consentement.</p>
+        </section>
+
+        <section class="mb-8">
+            <h2 class="text-xl font-semibold text-white mb-3">8. Sécurité</h2>
+            <p>Nous mettons en œuvre des mesures techniques et organisationnelles adaptées : connexion sécurisée (HTTPS), mots de passe chiffrés, accès restreint aux données.</p>
+        </section>
+
+        <section class="mb-8">
+            <h2 class="text-xl font-semibold text-white mb-3">9. Modifications</h2>
+            <p>La présente politique peut être mise à jour pour refléter les évolutions du site ou de la réglementation. La date de dernière mise à jour figure en haut de cette page.</p>
+        </section>
+
+    </div>
+{% endblock %}
