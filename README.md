@@ -1,169 +1,134 @@
-# 🎮 Marketplace de jeux vidéo
+# Replay
 
-Projet personnel d'apprentissage : une marketplace C2C permettant aux utilisateurs d'acheter et de vendre des jeux vidéo d'occasion.
+Replay est un site de vente de jeux vidéo d'occasion entre particuliers. Vous pouvez mettre en vente vos jeux, en acheter, les ajouter à votre liste de souhaits, laisser un avis après réception et poser des questions au vendeur.
 
-> Projet fictif à but pédagogique — aucune transaction réelle.
+> Replay est un site fictif, réalisé dans le cadre d'un projet personnel et à des fins de démonstration. Les informations légales (société, SIRET, etc.) sont inventées.
 
----
+## Fonctionnalités
 
-## 🎯 Objectifs d'apprentissage
+- Mise en vente d'un jeu, avec photo, prix, plateforme, état et PEGI
+- Recherche et filtres (catégorie, plateforme, état, prix, PEGI)
+- Panier et achat via Stripe (en mode test)
+- Liste de souhaits
+- Alertes lorsque le prix d'un jeu baisse ou monte, ou lorsqu'il revient en stock
+- Avis après réception d'une commande
+- Questions posées au vendeur sur chaque annonce
+- Signalement d'une annonce, avec suspension par l'administrateur
+- Tableau de bord pour suivre vos ventes
 
-- Maîtriser **Symfony** (Doctrine, Security, formulaires, services)
-- Mettre en place un environnement de développement **Docker** complet
-- Écrire des **tests automatisés** avec PHPUnit
-- Construire un pipeline **CI/CD** avec GitHub Actions
-- Déployer sur un environnement de **pré-production**
-- Découvrir **Tailwind CSS**
+## Technologies
 
----
+- PHP 8.3 et Symfony 7.4
+- Doctrine ORM et migrations
+- Twig et Tailwind CSS
+- Stripe (mode test uniquement)
+- Docker pour l'environnement local
+- PHPUnit pour les tests
 
-## 🛠️ Stack technique
+## Installation en local
 
-| Domaine | Technologie |
-|---|---|
-| Backend | Symfony |
-| Templates | Twig |
-| CSS | Tailwind CSS (via TailwindBundle) |
-| JavaScript | jQuery + AJAX |
-| Base de données | MariaDB |
-| Environnement local | Docker / Docker Compose |
-| Tests | PHPUnit |
-| CI/CD | GitHub Actions |
-| Pré-production | Railway |
-
----
-
-## 🚀 Installation
-
-### Prérequis
-
-- Docker et Docker Compose installés
-
-### Démarrage
+Il vous faut Docker et Docker Compose.
 
 ```bash
-# Cloner le projet
-git clone <url-du-repo>
-cd <nom-du-projet>
-
-# Créer le fichier d'environnement
-cp .env.example .env
-# Renseigner DB_ROOT_PASSWORD dans .env
-
-# Lancer les conteneurs
-docker compose up --build
+git clone <url-du-depot> replay
+cd replay
+cp .env .env.local
 ```
 
-### Accès
+Dans `.env.local`, renseignez au minimum la base de données et les clés Stripe de test (`STRIPE_SECRET_KEY` et `STRIPE_WEBHOOK_SECRET`).
 
-| Service | URL |
-|---|---|
-| Application | http://localhost:8080 |
-| phpMyAdmin | http://localhost:8082 |
-| MariaDB | localhost:3306 |
-
-### Commandes utiles
+Lancez ensuite les conteneurs et préparez la base :
 
 ```bash
-# Entrer dans le conteneur PHP
-docker compose exec php bash
-
-# Installer les dépendances
-docker compose exec php composer install
-
-# Lancer les migrations
+docker compose up -d
 docker compose exec php php bin/console doctrine:migrations:migrate
+docker compose exec php php bin/console importmap:install
+```
 
-# Charger les fixtures (données de test)
-docker compose exec php php bin/console doctrine:fixtures:load
+Le site est alors accessible à l'adresse définie dans votre configuration Docker.
 
-# Compiler Tailwind en mode watch
-docker compose exec php php bin/console tailwind:build --watch
+## Tests
 
-# Lancer les tests
+Pour lancer les tests de paiement :
+
+```bash
 docker compose exec php php bin/phpunit
 ```
 
----
+Les fichiers de test se trouvent dans le dossier `tests/`. Les variables Stripe utilisées pour les tests sont dans `.env.test`, avec des valeurs fictives.
 
-## 📦 Fonctionnalités
+## Mise en production
 
-### Phase 1 — Boutique
+Chaque envoi sur la branche `master` déclenche un déploiement automatique avec GitHub Actions. Le code est transféré sur l'hébergement, les migrations sont appliquées et le cache est reconstruit. Les clés et les accès au serveur sont stockés dans les secrets du dépôt, jamais dans le code.
 
-- [ ] Page d'accueil avec slider des nouveautés
-- [ ] Listing des jeux (cards, tri par prix, pagination)
-- [ ] Fiche produit détaillée (note moyenne, avis)
-- [ ] Barre de recherche
-- [ ] Inscription / connexion
-- [ ] Panier (session si non connecté, base si connecté, avec fusion à la connexion)
-- [ ] Passage de commande
-- [ ] Restriction d'accès à certaines pages si non connecté
+## Licence
 
-### Phase 2 — Marketplace
+Projet personnel, à des fins de démonstration. Aucune utilisation commerciale.
 
-- [ ] Formulaire de mise en vente d'un jeu
-- [ ] Page « Mes ventes » (statut : en vente / vendu)
-- [ ] Page « Mes achats » (historique des commandes)
-- [ ] Page « Ma wishlist »
-- [ ] Système d'avis sur les jeux
+# Replay
 
-### Phase 3 — Communauté
+Replay est un site de vente de jeux vidéo d'occasion entre particuliers. Vous pouvez mettre en vente vos jeux, en acheter, les ajouter à votre liste de souhaits, laisser un avis après réception et poser des questions au vendeur.
 
-- [ ] Forum avec catégories
-- [ ] Modération des annonces (back-office admin)
+> Replay est un site fictif, réalisé dans le cadre d'un projet personnel et à des fins de démonstration. Les informations légales (société, SIRET, etc.) sont inventées.
 
----
+## Fonctionnalités
 
-## 🗂️ Modèle de données
+- Mise en vente d'un jeu, avec photo, prix, plateforme, état et PEGI
+- Recherche et filtres (catégorie, plateforme, état, prix, PEGI)
+- Panier et achat via Stripe (en mode test)
+- Liste de souhaits
+- Alertes lorsque le prix d'un jeu baisse ou monte, ou lorsqu'il revient en stock
+- Avis après réception d'une commande
+- Questions posées au vendeur sur chaque annonce
+- Signalement d'une annonce, avec suspension par l'administrateur
+- Tableau de bord pour suivre vos ventes
 
+## Technologies
+
+- PHP 8.3 et Symfony 7.4
+- Doctrine ORM et migrations
+- Twig et Tailwind CSS
+- Stripe (mode test uniquement)
+- Docker pour l'environnement local
+- PHPUnit pour les tests
+
+## Installation en local
+
+Il vous faut Docker et Docker Compose.
+
+```bash
+git clone <url-du-depot> replay
+cd replay
+cp .env .env.local
 ```
-User ──< Jeu (vendeur)
-User ──< Avis >── Jeu
-User ──< PanierItem >── Jeu
-User ──< Commande ──< LigneCommande >── Jeu
-User ──< Wishlist >── Jeu
-Jeu >── Categorie
+
+Dans `.env.local`, renseignez au minimum la base de données et les clés Stripe de test (`STRIPE_SECRET_KEY` et `STRIPE_WEBHOOK_SECRET`).
+
+Lancez ensuite les conteneurs et préparez la base :
+
+```bash
+docker compose up -d
+docker compose exec php php bin/console doctrine:migrations:migrate
+docker compose exec php php bin/console importmap:install
 ```
 
-**Note :** l'entité `Jeu` porte un champ `statut` (`en_vente`, `vendu`, `retire`) afin de préparer l'ajout de la modération en phase 3 sans migration structurelle lourde.
+Le site est alors accessible à l'adresse définie dans votre configuration Docker.
 
----
+## Tests
 
-## 📋 Feuille de route technique
+Pour lancer les tests de paiement :
 
-### Mise en place
+```bash
+docker compose exec php php bin/phpunit
+```
 
-1. ✅ Environnement Docker (PHP + Apache + MariaDB + phpMyAdmin)
-2. ✅ Installation Symfony + page de test
-3. ⬜ Initialisation Git + repo GitHub
-4. ⬜ Environnement de pré-production sur Railway
-5. ⬜ Pipeline CI/CD (déploiement automatique)
-6. ⬜ Développement des fonctionnalités
-7. ⬜ Tests PHPUnit au fil du développement
-8. ⬜ Enrichissement du CI/CD (tests avant déploiement)
+Les fichiers de test se trouvent dans le dossier `tests/`. Les variables Stripe utilisées pour les tests sont dans `.env.test`, avec des valeurs fictives.
 
-### Ordre de développement Symfony
+## Mise en production
 
-1. Entités et relations Doctrine
-2. Migrations
-3. Fixtures (jeu de données de test)
-4. Authentification (préalable au panier)
-5. Controllers et templates
-6. Formulaires
-7. Logique du panier
-8. Tests
+Chaque envoi sur la branche `master` déclenche un déploiement automatique avec GitHub Actions. Le code est transféré sur l'hébergement, les migrations sont appliquées et le cache est reconstruit. Les clés et les accès au serveur sont stockés dans les secrets du dépôt, jamais dans le code.
 
----
+## Licence
 
-## 🧪 Tests
+Projet personnel, à des fins de démonstration. Aucune utilisation commerciale.
 
-Le projet vise une couverture sur deux niveaux :
-
-- **Tests unitaires** — logique métier isolée (calcul du total du panier, fusion des paniers session/base, règles de validation des avis)
-- **Tests fonctionnels** — parcours utilisateur complet (restriction d'accès, ajout au panier, passage de commande)
-
----
-
-## 📄 Licence
-
-Projet personnel à but pédagogique.
