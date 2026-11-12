@@ -17,8 +17,8 @@
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 items-end">
 
                 <div>
-                    <label class="block text-xs text-[#8a82a0] mb-1">Catégorie</label>
-                    <select name="categorie" class="w-full bg-[#110d1b] border border-[#2e2640] text-sm text-white rounded-md px-3 py-2 focus:outline-none focus:border-[#f5a623]">
+                    <label for="categorie" class="block text-xs text-[#8a82a0] mb-1">Catégorie</label>
+                    <select id="categorie" name="categorie" class="w-full bg-[#110d1b] border border-[#2e2640] text-sm text-white rounded-md px-3 py-2 focus:outline-none focus:border-[#f5a623]">
                         <option value="">Toutes</option>
                         {% for cat in categories %}
                             <option value="{{ cat.slug }}" {{ app.request.query.get('categorie') == cat.slug ? 'selected' : '' }}>
@@ -29,8 +29,8 @@
                 </div>
 
                 <div>
-                    <label class="block text-xs text-[#8a82a0] mb-1">Plateforme</label>
-                    <select name="plateforme" class="w-full bg-[#110d1b] border border-[#2e2640] text-sm text-white rounded-md px-3 py-2 focus:outline-none focus:border-[#f5a623]">
+                    <label for="plateforme" class="block text-xs text-[#8a82a0] mb-1">Plateforme</label>
+                    <select id="plateforme" name="plateforme" class="w-full bg-[#110d1b] border border-[#2e2640] text-sm text-white rounded-md px-3 py-2 focus:outline-none focus:border-[#f5a623]">
                         <option value="">Toutes</option>
                         {% for plateforme in plateformes %}
                             <option value="{{ plateforme.value }}" {{ app.request.query.get('plateforme') == plateforme.value ? 'selected' : '' }}>
@@ -41,8 +41,8 @@
                 </div>
 
                 <div>
-                    <label class="block text-xs text-[#8a82a0] mb-1">État</label>
-                    <select name="etat" class="w-full bg-[#110d1b] border border-[#2e2640] text-sm text-white rounded-md px-3 py-2 focus:outline-none focus:border-[#f5a623]">
+                    <label for="etat" class="block text-xs text-[#8a82a0] mb-1">État</label>
+                    <select id="etat" name="etat" class="w-full bg-[#110d1b] border border-[#2e2640] text-sm text-white rounded-md px-3 py-2 focus:outline-none focus:border-[#f5a623]">
                         <option value="">Tous</option>
                         {% for etat in etats %}
                             <option value="{{ etat.value }}" {{ app.request.query.get('etat') == etat.value ? 'selected' : '' }}>
@@ -53,22 +53,22 @@
                 </div>
 
                 <div>
-                    <label class="block text-xs text-[#8a82a0] mb-1">Prix min (€)</label>
-                    <input type="number" name="prix_min" min="0" step="1"
+                    <label for="prix_min" class="block text-xs text-[#8a82a0] mb-1">Prix min (€)</label>
+                    <input type="number" id="prix_min" name="prix_min" min="0" step="1"
                            value="{{ app.request.query.get('prix_min') }}"
                            class="w-full bg-[#110d1b] border border-[#2e2640] text-sm text-white rounded-md px-3 py-2 focus:outline-none focus:border-[#f5a623]">
                 </div>
 
                 <div>
-                    <label class="block text-xs text-[#8a82a0] mb-1">Prix max (€)</label>
-                    <input type="number" name="prix_max" min="0" step="1"
+                    <label for="prix_max" class="block text-xs text-[#8a82a0] mb-1">Prix max (€)</label>
+                    <input type="number" id="prix_max" name="prix_max" min="0" step="1"
                            value="{{ app.request.query.get('prix_max') }}"
                            class="w-full bg-[#110d1b] border border-[#2e2640] text-sm text-white rounded-md px-3 py-2 focus:outline-none focus:border-[#f5a623]">
                 </div>
 
                 <div>
-                    <label class="block text-xs text-[#8a82a0] mb-1">PEGI</label>
-                    <select name="pegi" class="w-full bg-[#110d1b] border border-[#2e2640] text-sm text-white rounded-md px-3 py-2 focus:outline-none focus:border-[#f5a623]">
+                    <label for="pegi" class="block text-xs text-[#8a82a0] mb-1">PEGI</label>
+                    <select id="pegi" name="pegi" class="w-full bg-[#110d1b] border border-[#2e2640] text-sm text-white rounded-md px-3 py-2 focus:outline-none focus:border-[#f5a623]">
                         <option value="">Tous</option>
                         {% for pegi in pegis %}
                             <option value="{{ pegi.value }}" {{ app.request.query.get('pegi') == pegi.value ? 'selected' : '' }}>
@@ -79,8 +79,8 @@
                 </div>
 
                 <div>
-                    <label class="block text-xs text-[#8a82a0] mb-1">Trier par</label>
-                    <select name="tri" class="w-full bg-[#110d1b] border border-[#2e2640] text-sm text-white rounded-md px-3 py-2 focus:outline-none focus:border-[#f5a623]">
+                    <label for="tri" class="block text-xs text-[#8a82a0] mb-1">Trier par</label>
+                    <select id="tri" name="tri" class="w-full bg-[#110d1b] border border-[#2e2640] text-sm text-white rounded-md px-3 py-2 focus:outline-none focus:border-[#f5a623]">
                         <option value="">Plus récents</option>
                         <option value="prix_asc" {{ app.request.query.get('tri') == 'prix_asc' ? 'selected' : '' }}>Prix croissant</option>
                         <option value="prix_desc" {{ app.request.query.get('tri') == 'prix_desc' ? 'selected' : '' }}>Prix décroissant</option>
