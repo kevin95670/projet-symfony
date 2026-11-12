@@ -184,5 +184,16 @@
         {% block body %}
 
         {% endblock %}
+
+        <footer class="mt-16 border-t border-[#2e2640] bg-[#110d1b]">
+            <div class="max-w-6xl mx-auto px-4 py-8 flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+                <p class="text-sm text-[#8a82a0]">&copy; {{ 'now'|date('Y') }} Replay. Site fictif à des fins de démonstration.</p>
+                <nav class="flex flex-wrap gap-x-6 gap-y-2 text-sm">
+                    <a href="{{ path('app_mentions') }}" class="text-[#b9b0cc] hover:text-[#f5a623] transition">Mentions légales</a>
+                    <a href="{{ path('app_cgv') }}" class="text-[#b9b0cc] hover:text-[#f5a623] transition">CGV</a>
+                    <a href="{{ path('app_confidentialite') }}" class="text-[#b9b0cc] hover:text-[#f5a623] transition">Confidentialité</a>
+                </nav>
+            </div>
+        </footer>
     </body>
 </html>
