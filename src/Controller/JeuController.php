@@ -88,6 +88,26 @@ final class JeuController extends AbstractController
 
         $dejaSignale = $user !== null && $em->getRepository(\App\Entity\SignalementJeu::class)->findOneBy(['jeu' => $jeu, 'auteur' => $user]) !== null;
 
+        // États des boutons : le jeu est-il déjà dans le panier ou la liste de souhaits de l'utilisateur ?
+        $dansPanier = false;
+        $dansWishlist = false;
+
+        if ($user !== null) {
+            $panier = $user->getPanier();
+            if ($panier !== null) {
+                foreach ($panier->getPanierItems() as $item) {
+                    if ($item->getJeu()?->getId() === $jeu->getId()) {
+                        $dansPanier = true;
+                        break;
+                    }
+                }
+            }
+            $dansWishlist = $em->getRepository(WishlistItem::class)->findOneBy(['user' => $user, 'jeu' => $jeu]) !== null;
+        } else {
+            // Visiteur non connecté : le panier est dans la session
+            $dansPanier = isset($request->getSession()->get('cart', [])[$jeu->getId()]);
+        }
+
         $fil = [];
         $filsVendeur = [];
         $acheteurActif = null;
@@ -117,6 +137,9 @@ final class JeuController extends AbstractController
             'jeu' => $jeu,
             'masque' => $jeu->isMasque(),
             'dejaSignale' => $dejaSignale,
+            'estVendeur' => $estVendeur,
+            'dansPanier' => $dansPanier,
+            'dansWishlist' => $dansWishlist,
             'fil' => $fil,
             'estVendeur' => $estVendeur,
             'filsVendeur' => $filsVendeur,
