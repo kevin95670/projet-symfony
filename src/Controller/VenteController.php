@@ -91,7 +91,7 @@ final class VenteController extends AbstractController
         // Email à l'acheteur quand le colis part
         try {
             $email = (new TemplatedEmail())
-                ->from(new Address('kevinleonard.info@gmail.com', 'Kevin'))
+                ->from(new Address('contact@replay.kevinleonard.fr', 'Kevin'))
                 ->to((string) $acheteur->getEmail())
                 ->subject('Ton jeu a été expédié !')
                 ->htmlTemplate('commande/expedie.html.twig')

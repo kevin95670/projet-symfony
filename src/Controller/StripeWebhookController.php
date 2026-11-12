@@ -89,7 +89,7 @@ final class StripeWebhookController extends AbstractController
         try {
             $user = $panier->getUser();
             $email = (new TemplatedEmail())
-                ->from(new Address('kevinleonard.info@gmail.com', 'Kevin'))
+                ->from(new Address('contact@replay.kevinleonard.fr', 'Kevin'))
                 ->to((string) $user->getEmail())
                 ->subject('Merci pour votre commande !')
                 ->htmlTemplate('commande/commande.html.twig')
@@ -131,7 +131,7 @@ final class StripeWebhookController extends AbstractController
     {
         try {
             $email = (new TemplatedEmail())
-                ->from(new Address('kevinleonard.info@gmail.com', 'Kevin'))
+                ->from(new Address('contact@replay.kevinleonard.fr', 'Kevin'))
                 ->to((string) $user->getEmail())
                 ->subject('Ton paiement a été remboursé')
                 ->htmlTemplate('commande/remboursement.html.twig')

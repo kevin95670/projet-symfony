@@ -38,7 +38,7 @@ class RegistrationController extends AbstractController
             // do anything else you need here, like send an email
             try {
             $email = (new TemplatedEmail())
-            ->from(new Address('kevinleonard.info@gmail.com', 'Kevin'))
+            ->from(new Address('contact@replay.kevinleonard.fr', 'Kevin'))
             ->to((string) $user->getEmail())
             ->subject('Bienvenue sur notre site !')
             ->htmlTemplate('registration/welcome.html.twig')
