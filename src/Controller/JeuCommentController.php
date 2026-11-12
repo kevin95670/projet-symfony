@@ -3,8 +3,10 @@
 namespace App\Controller;
 
 use App\Entity\JeuComment;
+use App\Entity\User;
 use App\Repository\JeuRepository;
 use App\Repository\JeuCommentRepository;
+use App\Service\NotificationService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
@@ -16,37 +18,33 @@ final class JeuCommentController extends AbstractController
 
     #[Route('/jeu/{jeuId}/{commentId}/delete', name: 'app_comment_delete', methods: ['POST'])]
     public function delete(
-        int $jeuId, 
+        int $jeuId,
         int $commentId,
         JeuCommentRepository $commentRepository,
         EntityManagerInterface $em
     ): Response
     {
         $comment = $commentRepository->find($commentId);
-        
-        // Vérifier que le commentaire existe
+
         if (!$comment) {
             throw $this->createNotFoundException('Commentaire non trouvé');
         }
-        
-        // Vérifier que c'est l'auteur
+
+        // Seul l'auteur peut supprimer son message
         if ($comment->getAuteur() !== $this->getUser()) {
             throw $this->createAccessDeniedException();
         }
 
-        // Soft delete
+        // Soft delete : le message reste dans le fil, marqué comme supprimé
         $comment->setIsDeleted(true);
         $em->flush();
 
-        return $this->redirectToRoute('app_jeu', [
-            'id' => $jeuId,
-            'slug' => $comment->getJeu()->getSlug()
-        ]);
+        return $this->redirectVersFil($comment);
     }
 
     #[Route('/jeu/{jeuId}/{commentId}/update', name: 'app_comment_update', methods: ['POST'])]
     public function update(
-        int $jeuId, 
+        int $jeuId,
         int $commentId,
         JeuCommentRepository $commentRepository,
         EntityManagerInterface $em,
@@ -54,18 +52,16 @@ final class JeuCommentController extends AbstractController
     ): Response
     {
         $comment = $commentRepository->find($commentId);
-        
-        // Vérifier que le commentaire existe
+
         if (!$comment) {
             throw $this->createNotFoundException('Commentaire non trouvé');
         }
-        
-        // Vérifier que c'est l'auteur
+
+        // Seul l'auteur peut modifier son message
         if ($comment->getAuteur() !== $this->getUser()) {
             throw $this->createAccessDeniedException();
         }
 
-        // Mettre à jour le contenu du commentaire
         $data = $request->request->all();
         $content = $data['comment']['contenu'] ?? '';
 
@@ -75,46 +71,91 @@ final class JeuCommentController extends AbstractController
             $em->flush();
         }
 
-        return $this->redirectToRoute('app_jeu', [
-            'id' => $jeuId,
-            'slug' => $comment->getJeu()->getSlug()
-        ]);
+        return $this->redirectVersFil($comment);
     }
 
     #[Route('/jeu/{jeuId}/create', name: 'app_comment_create', methods: ['POST'])]
     public function create(
-        int $jeuId, 
+        int $jeuId,
         JeuRepository $jeuRepository,
+        JeuCommentRepository $commentRepository,
         EntityManagerInterface $em,
+        NotificationService $notifications,
         Request $request
     ): Response
     {
         $jeu = $jeuRepository->find($jeuId);
-        
-        // Vérifier que le jeu existe
+
         if (!$jeu) {
             throw $this->createNotFoundException('Jeu non trouvé');
         }
 
-        // Créer un nouveau commentaire
-        $comment = new JeuComment();
-        $data = $request->request->all();
-        $content = $data['comment']['contenu'] ?? '';
-        
-        if (!empty($content)) {
-            $comment->setContenu($content);
-            $comment->setJeu($jeu);
-            $comment->setAuteur($this->getUser());
-            $comment->setDateCreation(new \DateTimeImmutable());
-            $comment->setIsDeleted(false);
-            
-            $em->persist($comment);
-            $em->flush();
+        /** @var User|null $user */
+        $user = $this->getUser();
+        if (!$user) {
+            throw $this->createAccessDeniedException('Connecte-toi pour écrire au vendeur.');
         }
 
-        return $this->redirectToRoute('app_jeu', [
-            'id' => $jeuId,
-            'slug' => $jeu->getSlug()
-        ]);
+        $data = $request->request->all();
+        $content = trim($data['comment']['contenu'] ?? '');
+
+        if ($content === '') {
+            return $this->redirectToRoute('app_jeu', ['id' => $jeuId, 'slug' => $jeu->getSlug()]);
+        }
+
+        $estVendeur = $user === $jeu->getVendeur();
+
+        if ($estVendeur) {
+            // Le vendeur répond dans le fil d'un acheteur précis
+            $acheteur = $em->getRepository(User::class)->find($request->request->getInt('acheteurId'));
+
+            if (!$acheteur || count($commentRepository->messagesDuFil($jeu, $acheteur)) === 0) {
+                throw $this->createAccessDeniedException('Ce fil n\'existe pas pour ce jeu.');
+            }
+        } else {
+            // L'acheteur écrit dans son propre fil : il ne voit que ses messages et ceux du vendeur
+            $acheteur = $user;
+        }
+
+        $comment = new JeuComment();
+        $comment->setContenu($content);
+        $comment->setJeu($jeu);
+        $comment->setAuteur($user);
+        $comment->setAcheteur($acheteur);
+        $comment->setDateCreation(new \DateTimeImmutable());
+        $comment->setIsDeleted(false);
+
+        $em->persist($comment);
+        $em->flush();
+
+        // Notification à l'autre personne du fil
+        if ($estVendeur) {
+            $notifications->creer(
+                $acheteur,
+                sprintf('Le vendeur de « %s » t\'a répondu.', $jeu->getTitre()),
+                $this->generateUrl('app_jeu', ['id' => $jeu->getId(), 'slug' => $jeu->getSlug()])
+            );
+        } else {
+            $notifications->creer(
+                $jeu->getVendeur(),
+                sprintf('%s t\'a écrit à propos de « %s ».', $user->getPseudo(), $jeu->getTitre()),
+                $this->generateUrl('app_jeu', ['id' => $jeu->getId(), 'slug' => $jeu->getSlug(), 'fil' => $acheteur->getId()])
+            );
+        }
+
+        return $this->redirectVersFil($comment);
+    }
+
+    // Revient sur la page du jeu, en gardant le fil ouvert pour le vendeur
+    private function redirectVersFil(JeuComment $comment): Response
+    {
+        $jeu = $comment->getJeu();
+        $parametres = ['id' => $jeu->getId(), 'slug' => $jeu->getSlug()];
+
+        if ($this->getUser() === $jeu->getVendeur() && $comment->getAcheteur()) {
+            $parametres['fil'] = $comment->getAcheteur()->getId();
+        }
+
+        return $this->redirectToRoute('app_jeu', $parametres);
     }
 }

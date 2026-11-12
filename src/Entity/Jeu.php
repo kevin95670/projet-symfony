@@ -29,6 +29,14 @@ class Jeu
     #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2)]
     private ?string $prix = null;
 
+    // Ancien prix, gardé après une modification de prix pour l'afficher barré (null = pas de changement)
+    #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2, nullable: true)]
+    private ?string $prixPrecedent = null;
+
+    // Annonce masquée (après un signalement ou par l'admin) : invisible sur le site, mais conservée
+    #[ORM\Column(options: ['default' => false])]
+    private bool $masque = false;
+
     #[ORM\Column(type: Types::DATE_MUTABLE)]
     private ?\DateTime $date_creation = null;
 
@@ -133,6 +141,30 @@ class Jeu
     public function setPrix(string $prix): static
     {
         $this->prix = $prix;
+
+        return $this;
+    }
+
+    public function getPrixPrecedent(): ?string
+    {
+        return $this->prixPrecedent;
+    }
+
+    public function setPrixPrecedent(?string $prixPrecedent): static
+    {
+        $this->prixPrecedent = $prixPrecedent;
+
+        return $this;
+    }
+
+    public function isMasque(): bool
+    {
+        return $this->masque;
+    }
+
+    public function setMasque(bool $masque): static
+    {
+        $this->masque = $masque;
 
         return $this;
     }

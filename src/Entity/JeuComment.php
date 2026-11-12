@@ -18,9 +18,15 @@ class JeuComment
     #[ORM\JoinColumn(nullable: false)]
     private ?Jeu $jeu = null;
 
+    // Personne qui a écrit le message (l'acheteur ou le vendeur)
     #[ORM\ManyToOne(inversedBy: 'jeuComments')]
     #[ORM\JoinColumn(nullable: false)]
     private ?User $auteur = null;
+
+    // Acheteur à qui appartient le fil : le fil relie cet acheteur au vendeur du jeu
+    #[ORM\ManyToOne]
+    #[ORM\JoinColumn(nullable: true)]
+    private ?User $acheteur = null;
 
     #[ORM\Column(type: Types::TEXT)]
     private ?string $contenu = null;
@@ -59,6 +65,18 @@ class JeuComment
     public function setAuteur(?User $auteur): static
     {
         $this->auteur = $auteur;
+
+        return $this;
+    }
+
+    public function getAcheteur(): ?User
+    {
+        return $this->acheteur;
+    }
+
+    public function setAcheteur(?User $acheteur): static
+    {
+        $this->acheteur = $acheteur;
 
         return $this;
     }

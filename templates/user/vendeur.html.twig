@@ -77,7 +77,7 @@
         <div class="flex gap-8 sm:border-l sm:border-[#2e2640] sm:pl-8">
             <div>
                 <div class="text-2xl font-bold text-[#f5a623]">{{ vendeur.jeux|length }}</div>
-                <div class="text-xs text-[#8a82a0] uppercase tracking-wide">Annonces</div>
+                <div class="text-xs text-[#8a82a0] uppercase tracking-wide">Annonces totales</div>
             </div>
         </div>
 
@@ -98,8 +98,8 @@
             <div class="text-sm text-[#b9b0cc] mt-2">Prix moyen (en cours)</div>
         </div>
         <div class="text-center">
-            <div class="text-3xl font-bold text-[#f5a623]">{{ vendeur.jeux|length }}</div>
-            <div class="text-sm text-[#b9b0cc] mt-2">En vente actuellement</div>
+            <div class="text-3xl font-bold text-[#f5a623]">{{ vendeur.jeux|filter(j => j.statut.name == 'EN_VENTE')|length }}</div>
+            <div class="text-sm text-[#b9b0cc] mt-2">Annonces en cours</div>
         </div>
     </div>
 
@@ -109,12 +109,13 @@
     {% if vendeur.jeux|length > 0 %}
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {% for vente in vendeur.jeux %}
+            {% set estVendu = vente.statut.name == 'VENDU' %}
             <article class="group bg-[#1c1628] border border-[#2e2640] rounded-lg overflow-hidden hover:border-[#f5a623]/60 transition">
 
-                <div class="aspect-4/3 bg-[#2a2040] overflow-hidden">
+                <div class="relative aspect-4/3 bg-[#2a2040] overflow-hidden">
                     {% if vente.image %}
-                        <img src="{{ vente.image }}" alt="{{ vente.titre }}"
-                             class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
+                        <img src="{{ vente.image }}" alt="{{ vente.titre }}" loading="lazy"
+                             class="w-full h-full object-cover group-hover:scale-105 transition duration-300 {{ estVendu ? 'opacity-60' : '' }}">
                     {% else %}
                         <div class="w-full h-full flex items-center justify-center text-[#5d5573] text-sm">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
@@ -122,12 +123,19 @@
                             </svg>
                         </div>
                     {% endif %}
+
+                    {# Bandeau « Vendu » sur les annonces vendues #}
+                    {% if estVendu %}
+                        <span class="absolute top-3 left-3 px-3 py-1 rounded-sm text-xs font-bold bg-[#ff8a80] text-[#111]">
+                            Vendu
+                        </span>
+                    {% endif %}
                 </div>
 
                 <div class="p-5">
                     <div class="flex items-start justify-between gap-3 mb-2">
                         <h3 class="font-semibold text-white leading-snug">{{ vente.titre }}</h3>
-                        <span class="shrink-0 text-lg font-bold text-[#f5a623]">{{ vente.prix }} €</span>
+                        <span class="shrink-0 text-lg font-bold {{ estVendu ? 'text-[#8a82a0] line-through' : 'text-[#f5a623]' }}">{{ vente.prix }} €</span>
                     </div>
 
                     <p class="text-sm text-[#b9b0cc] line-clamp-2 mb-4">{{ vente.description }}</p>
@@ -150,7 +158,7 @@
         </div>
     {% else %}
         <p class="col-span-full text-[#8a82a0] py-12 text-center">
-            Ce vendeur n'a aucune annonce en ligne.
+            Ce vendeur n'a aucune annonce pour le moment.
         </p>
     {% endif %}
 

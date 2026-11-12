@@ -1,0 +1,85 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Tableau de bord{% endblock %}
+
+{% block body %}
+<div class="max-w-6xl mx-auto px-4 py-10">
+
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
+        <h1 class="text-2xl font-bold text-white">Tableau de bord</h1>
+        <a href="{{ path('app_ventes', {'vendeurId': app.user.id}) }}"
+           class="text-sm text-[#b9b0cc] hover:text-[#f5a623] transition">Voir mes ventes →</a>
+    </div>
+
+    {# Chiffres clés #}
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        <div class="bg-[#1c1628] border border-[#2e2640] rounded-lg p-5">
+            <p class="text-xs text-[#8a82a0] uppercase tracking-wider mb-2">Jeux en vente</p>
+            <p class="text-3xl font-bold text-white">{{ jeuxEnVente }}</p>
+        </div>
+        <div class="bg-[#1c1628] border border-[#2e2640] rounded-lg p-5">
+            <p class="text-xs text-[#8a82a0] uppercase tracking-wider mb-2">Jeux vendus</p>
+            <p class="text-3xl font-bold text-white">{{ jeuxVendus }}</p>
+        </div>
+        <div class="bg-[#1c1628] border border-[#2e2640] rounded-lg p-5">
+            <p class="text-xs text-[#8a82a0] uppercase tracking-wider mb-2">Chiffre d'affaires</p>
+            <p class="text-3xl font-bold text-[#f5a623]">{{ chiffreAffaires|number_format(2, ',', ' ') }} €</p>
+        </div>
+        <div class="bg-[#1c1628] border border-[#2e2640] rounded-lg p-5">
+            <p class="text-xs text-[#8a82a0] uppercase tracking-wider mb-2">Note moyenne</p>
+            {% if noteMoyenne is not null %}
+                <p class="text-3xl font-bold text-white">{{ noteMoyenne|number_format(1, ',', ' ') }} <span class="text-lg text-[#f5a623]">★</span></p>
+                <p class="text-xs text-[#8a82a0] mt-1">{{ nombreAvis }} avis</p>
+            {% else %}
+                <p class="text-sm text-[#8a82a0]">Aucun avis pour le moment</p>
+            {% endif %}
+        </div>
+    </div>
+
+    {# Avancement des envois #}
+    <div class="grid grid-cols-3 gap-4 mb-8">
+        <div class="bg-[#1c1628] border border-[#2e2640] rounded-lg p-4 text-center">
+            <p class="text-2xl font-bold text-[#ff8a80]">{{ aExpedier|length }}</p>
+            <p class="text-xs text-[#8a82a0] mt-1">À expédier</p>
+        </div>
+        <div class="bg-[#1c1628] border border-[#2e2640] rounded-lg p-4 text-center">
+            <p class="text-2xl font-bold text-[#f5a623]">{{ nombreExpediees }}</p>
+            <p class="text-xs text-[#8a82a0] mt-1">Expédiées</p>
+        </div>
+        <div class="bg-[#1c1628] border border-[#2e2640] rounded-lg p-4 text-center">
+            <p class="text-2xl font-bold text-[#9ae6b4]">{{ nombreRecues }}</p>
+            <p class="text-xs text-[#8a82a0] mt-1">Reçues</p>
+        </div>
+    </div>
+
+    {# Commandes à expédier #}
+    <div class="bg-[#1c1628] border border-[#2e2640] rounded-lg overflow-hidden">
+        <div class="flex justify-between items-center px-6 py-4 border-b border-[#2e2640]">
+            <h2 class="font-semibold text-white">Jeux à expédier</h2>
+            <a href="{{ path('app_ventes_expeditions') }}"
+               class="text-sm font-medium text-[#f5a623] hover:text-white transition">Gérer les expéditions →</a>
+        </div>
+
+        {% if aExpedier|length > 0 %}
+            <ul class="divide-y divide-[#2e2640]">
+                {% for ligne in aExpedier %}
+                    <li class="flex items-center justify-between gap-4 px-6 py-4">
+                        <div class="min-w-0">
+                            <p class="font-medium text-white truncate">{{ ligne.jeu.titre }}</p>
+                            <p class="text-sm text-[#8a82a0]">
+                                Quantité : {{ ligne.quantite }} · Commande du {{ ligne.commande.dateCommande|date('d/m/Y') }}
+                            </p>
+                        </div>
+                        <p class="font-bold text-[#f5a623] shrink-0">
+                            {{ (ligne.prixUnitaire * ligne.quantite)|number_format(2, ',', ' ') }} €
+                        </p>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p class="px-6 py-8 text-center text-[#8a82a0]">Rien à expédier pour le moment.</p>
+        {% endif %}
+    </div>
+
+</div>
+{% endblock %}

@@ -30,7 +30,7 @@ final class StripeController extends AbstractController
         // Un jeu vendu entre-temps ne doit pas partir au paiement : on le retire du panier
         $indisponibles = [];
         foreach ($panier->getPanierItems() as $item) {
-            if ($item->getJeu()->getStatut() !== JeuStatut::EN_VENTE) {
+            if ($item->getJeu()->getStatut() !== JeuStatut::EN_VENTE || $item->getJeu()->isMasque()) {
                 $indisponibles[] = $item;
             }
         }
@@ -50,6 +50,19 @@ final class StripeController extends AbstractController
             return $this->redirectToRoute('app_cart');
         }
 
+        $stripe = new StripeClient($_ENV['STRIPE_SECRET_KEY'] ?? getenv('STRIPE_SECRET_KEY'));
+
+        // Client Stripe de l'acheteur : créé au premier achat, puis réutilisé (son adresse est pré-remplie)
+        if (!$user->getStripeCustomerId()) {
+            $client = $stripe->customers->create([
+                'email' => $user->getEmail(),
+                'name' => trim($user->getPrenom() . ' ' . $user->getNom()),
+                'metadata' => ['user_id' => $user->getId()],
+            ]);
+            $user->setStripeCustomerId($client->id);
+            $em->flush();
+        }
+
         // Une ligne par jeu du panier. Stripe attend le prix en centimes (entier)
         $lignes = [];
         foreach ($panier->getPanierItems() as $item) {
@@ -65,15 +78,17 @@ final class StripeController extends AbstractController
             ];
         }
 
-        $stripe = new StripeClient($_ENV['STRIPE_SECRET_KEY'] ?? getenv('STRIPE_SECRET_KEY'));
-
         $session = $stripe->checkout->sessions->create([
             'mode' => 'payment',
             'line_items' => $lignes,
-            'customer_email' => $user->getEmail(),
-            // Adresse de livraison demandée sur la page Stripe (France uniquement pour l'instant)
+            'customer' => $user->getStripeCustomerId(),
+            // Adresse de livraison : demandée (ou pré-remplie) sur la page Stripe, France uniquement pour l'instant
             'shipping_address_collection' => [
                 'allowed_countries' => ['FR'],
+            ],
+            // Enregistre l'adresse saisie sur le client Stripe, pour la pré-remplir au prochain achat
+            'customer_update' => [
+                'shipping' => 'auto',
             ],
             // Ces infos serviront au webhook pour retrouver le panier
             'metadata' => [

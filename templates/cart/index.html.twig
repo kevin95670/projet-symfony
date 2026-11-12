@@ -79,7 +79,14 @@
 
                                 <div class="flex-1 min-w-0">
                                     <h3 class="font-medium text-white truncate">{{ item.jeu.titre }}</h3>
-                                    <p class="text-sm text-[#8a82a0] mt-1">{{ item.jeu.prix }} € / unité</p>
+
+                                    {# Si le prix a changé, l'ancien est affiché barré au-dessus du nouveau #}
+                                    <div>
+                                        {% if item.jeu.prixPrecedent %}
+                                            <p class="text-xs text-[#8a82a0] line-through">{{ item.jeu.prixPrecedent }} €</p>
+                                        {% endif %}
+                                        <p class="text-sm text-[#8a82a0] mt-1">{{ item.jeu.prix }} € / unité</p>
+                                    </div>
 
                                     <div class="flex items-center gap-4 mt-3">
 

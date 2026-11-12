@@ -5,7 +5,11 @@ namespace App\Controller;
 use App\Repository\JeuRepository;
 use App\Repository\CategorieRepository;
 use App\Repository\WishlistItemRepository;
+use App\Enum\Etat;
+use App\Enum\JeuStatut;
 use App\Enum\Pegi;
+use App\Enum\Plateforme;
+use App\Service\AlerteService;
 use Symfony\Component\HttpFoundation\Request;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Entity\Jeu;
@@ -28,13 +32,6 @@ final class JeuController extends AbstractController
     #[Route('/jeu/categorie/{slug}', name: 'app_jeux_par_categorie')]
     public function apercu_jeux_par_categorie(JeuRepository $jeuRepository, string $slug): Response
     {
-        /*$jeux = $jeuRepository->findAllByCategorie($slug);
-
-        return $this->render('jeu/listing.html.twig', [
-            'jeux' => $jeux,
-            'categorie' => ['nom' => $slug],
-        ]);*/
-
         return $this->redirectToRoute('app_jeux_liste', ['categorie' => $slug]);
     }
 
@@ -49,11 +46,14 @@ final class JeuController extends AbstractController
         $query = $request->query->get('q') ?? $request->query->get('query', '');
 
         $filtres = [
-            'query'     => $query,
-            'categorie' => $request->query->get('categorie', ''),
-            'prix_min'  => $request->query->get('prix_min', ''),
-            'prix_max'  => $request->query->get('prix_max', ''),
-            'pegi'      => $request->query->get('pegi', ''),
+            'query'      => $query,
+            'categorie'  => $request->query->get('categorie', ''),
+            'prix_min'   => $request->query->get('prix_min', ''),
+            'prix_max'   => $request->query->get('prix_max', ''),
+            'pegi'       => $request->query->get('pegi', ''),
+            'plateforme' => $request->query->get('plateforme', ''),
+            'etat'       => $request->query->get('etat', ''),
+            'tri'        => $request->query->get('tri', ''),
         ];
 
         // Jeux de la page demandée, et nombre total de pages
@@ -65,27 +65,68 @@ final class JeuController extends AbstractController
             'query' => $query,
             'categories' => $categorieRepository->findAllOrderByOrdreAlphabetique(),
             'pegis' => Pegi::cases(),
+            'plateformes' => Plateforme::cases(),
+            'etats' => Etat::cases(),
             'page' => $numeroPage,
             'pages' => $nombrePages,
         ]);
     }
 
     #[Route('/jeu/{slug}/{id}', name: 'app_jeu', requirements: ['id' => '\d+'])]
-    public function apercu_jeu(JeuRepository $jeuRepository,JeuCommentRepository $jeuCommentRepository, string $slug): Response
+    public function apercu_jeu(Request $request, JeuRepository $jeuRepository, JeuCommentRepository $jeuCommentRepository, EntityManagerInterface $em, string $slug): Response
     {
         $jeu = $jeuRepository->findOneBySlug($slug);
-        $comments = $jeuCommentRepository->findByJeu($jeu);
+
+        /** @var \App\Entity\User|null $user */
+        $user = $this->getUser();
+        $estVendeur = $user !== null && $user === $jeu->getVendeur();
+
+        // Annonce masquée : seuls le vendeur et l'admin peuvent la voir
+        if ($jeu->isMasque() && !$estVendeur && !$this->isGranted('ROLE_ADMIN')) {
+            throw $this->createNotFoundException('Cette annonce n\'est plus disponible.');
+        }
+
+        $dejaSignale = $user !== null && $em->getRepository(\App\Entity\SignalementJeu::class)->findOneBy(['jeu' => $jeu, 'auteur' => $user]) !== null;
+
+        $fil = [];
+        $filsVendeur = [];
+        $acheteurActif = null;
+
+        if ($user !== null && !$estVendeur) {
+            // Acheteur : il voit seulement son propre fil avec le vendeur
+            $fil = $jeuCommentRepository->messagesDuFil($jeu, $user);
+        } elseif ($estVendeur) {
+            // Vendeur : liste des acheteurs qui ont écrit, et le fil de celui qui est choisi (?fil=ID)
+            $filsVendeur = $jeuCommentRepository->acheteursAvecMessages($jeu);
+            $idChoisi = $request->query->getInt('fil');
+
+            foreach ($filsVendeur as $acheteur) {
+                if ($acheteur->getId() === $idChoisi) {
+                    $acheteurActif = $acheteur;
+                    break;
+                }
+            }
+
+            if ($acheteurActif !== null) {
+                $fil = $jeuCommentRepository->messagesDuFil($jeu, $acheteurActif);
+            }
+        }
 
         return $this->render('jeu/index.html.twig', [
             'controller_name' => 'JeuController',
             'jeu' => $jeu,
-            'comments' => $comments,
+            'masque' => $jeu->isMasque(),
+            'dejaSignale' => $dejaSignale,
+            'fil' => $fil,
+            'estVendeur' => $estVendeur,
+            'filsVendeur' => $filsVendeur,
+            'acheteurActif' => $acheteurActif,
         ]);
     }
 
     #[Route('/jeu/{slug}/{id}/editer', name: 'app_jeu_modifier')]
     #[IsGranted('ROLE_USER')]
-    public function modifierJeu(Request $request, EntityManagerInterface $em, Jeu $jeu): Response
+    public function modifierJeu(Request $request, EntityManagerInterface $em, Jeu $jeu, AlerteService $alertes): Response
     {
 
         /** @var \App\Entity\User|null $user */
@@ -96,10 +137,14 @@ final class JeuController extends AbstractController
             throw $this->createAccessDeniedException('Vous ne pouvez pas modifier ce jeu.');
         }
 
-        if ($jeu->getStatut() === \App\Enum\JeuStatut::VENDU) {
+        // Un jeu vendu ne peut plus être modifié
+        if ($jeu->getStatut() === JeuStatut::VENDU) {
             $this->addFlash('error', 'Un jeu vendu ne peut plus être modifié.');
             return $this->redirectToRoute('app_ventes', ['vendeurId' => $user->getId()]);
         }
+
+        // Ancien prix mémorisé avant que le formulaire ne modifie l'objet
+        $ancienPrix = $jeu->getPrix();
 
         $form = $this->createForm(JeuEditType::class, $jeu);
         $form->handleRequest($request);
@@ -107,9 +152,18 @@ final class JeuController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             // Nouvelle photo : on la remplace seulement si l'utilisateur en a envoyé une
             $this->enregistrerPhoto($form, $jeu);
-            $jeu->setMiseAJour(new \DateTimeImmutable());
 
+            // Si le prix a changé, on garde l'ancien pour l'afficher barré sur l'annonce
+            if ((float) $ancienPrix !== (float) $jeu->getPrix()) {
+                $jeu->setPrixPrecedent($ancienPrix);
+            }
+
+            // Date de mise à jour définie avant l'enregistrement, pour qu'elle soit bien sauvegardée
+            $jeu->setMiseAJour(new \DateTimeImmutable());
             $em->flush();
+
+            // Alerte de baisse ou de hausse de prix, seulement si le prix a changé
+            $alertes->prixModifie($jeu, $ancienPrix);
 
             $this->addFlash('success', 'Jeu mis à jour avec succès.');
             return $this->redirectToRoute('app_ventes', ['vendeurId' => $user->getId()]);
@@ -143,7 +197,7 @@ final class JeuController extends AbstractController
 
     #[Route('/jeu/vendre', name: 'app_jeu_vendre')]
     #[IsGranted('ROLE_USER')]
-    public function vendre_jeu(Request $request, EntityManagerInterface $em): Response
+    public function vendre_jeu(Request $request, EntityManagerInterface $em, AlerteService $alertes): Response
     {
         $jeu = new Jeu();
         $form = $this->createForm(JeuForm::class, $jeu);
@@ -155,13 +209,16 @@ final class JeuController extends AbstractController
             $jeu->setVendeur($this->getUser());
             $jeu->setDateCreation(new \DateTime());
             $jeu->setSlug($slugger->slug($jeu->getTitre())->lower()->toString());
-            $jeu->setStatut(\App\Enum\JeuStatut::EN_VENTE);
+            $jeu->setStatut(JeuStatut::EN_VENTE);
 
             // Photo envoyée depuis l'ordinateur, si elle existe
             $this->enregistrerPhoto($form, $jeu);
 
             $em->persist($jeu);
             $em->flush();
+
+            // Alerte de retour en stock pour les acheteurs qui ont ce titre sur cette plateforme
+            $alertes->miseEnVenteNouvelle($jeu);
 
             $this->addFlash('success', 'Ton jeu a bien été mis en vente !');
 
@@ -187,9 +244,10 @@ final class JeuController extends AbstractController
             throw $this->createAccessDeniedException('Vous ne pouvez pas accéder aux ventes d\'un autre utilisateur.');
         }
 
-        if ($jeu->getStatut() === \App\Enum\JeuStatut::VENDU) {
-            $this->addFlash('error', 'Un jeu vendu ne peut plus être supprimé : il est lié à une commande.');
-            return $this->redirectToRoute('app_ventes', ['vendeurId' => $user->getId()]);
+        // Un jeu vendu ne peut pas être supprimé : il est lié à une commande
+        if ($jeu->getStatut() === JeuStatut::VENDU) {
+            $this->addFlash('error', 'Un jeu vendu ne peut pas être supprimé : il est lié à une commande.');
+            return $this->redirectToRoute('app_ventes', ['vendeurId' => $vendeurId]);
         }
 
         $em->remove($jeu);

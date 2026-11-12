@@ -94,6 +94,14 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(targetEntity: JeuComment::class, mappedBy: 'auteur')]
     private Collection $jeuComments;
 
+    // Identifiant du client chez Stripe, créé au premier achat
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $stripeCustomerId = null;
+
+    // Dernière adresse de livraison utilisée (nom, ligne1, ligne2, code_postal, ville, pays)
+    #[ORM\Column(type: Types::JSON, nullable: true)]
+    private ?array $adresseLivraison = null;
+
     public function __construct()
     {
         $this->jeux = new ArrayCollection();
@@ -450,6 +458,30 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
                 $jeuComment->setAuteur(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getStripeCustomerId(): ?string
+    {
+        return $this->stripeCustomerId;
+    }
+
+    public function setStripeCustomerId(?string $stripeCustomerId): static
+    {
+        $this->stripeCustomerId = $stripeCustomerId;
+
+        return $this;
+    }
+
+    public function getAdresseLivraison(): ?array
+    {
+        return $this->adresseLivraison;
+    }
+
+    public function setAdresseLivraison(?array $adresseLivraison): static
+    {
+        $this->adresseLivraison = $adresseLivraison;
 
         return $this;
     }

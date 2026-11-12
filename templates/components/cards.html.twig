@@ -1,18 +1,4 @@
-{#
-    Carte de jeu, utilisée par l'accueil et la liste de souhaits.
-    - jeu : le jeu à afficher (obligatoire)
-    - panierItemsIds : ids des jeux dans le panier (facultatif)
-    - wishlistItemsIds : ids des jeux en wishlist (facultatif)
-    - wishlistItem : l'élément de wishlist (facultatif, seulement sur la page wishlist :
-      active le bouton de retrait, la date de modification et le voile si le jeu n'est plus en vente)
-#}
-{% set isOwnJeu = app.user and jeu.vendeur.id == app.user.id %}
-{% set isAvailable = jeu.statut.name == 'EN_VENTE' %}
-{% set in_panier = jeu.id in (panierItemsIds|default([])) %}
-{% set in_wishlist = app.user and (wishlistItem is defined or jeu.id in (wishlistItemsIds|default([]))) %}
-{% set isModified = wishlistItem is defined and jeu.getMiseAJour() and wishlistItem.getDateAjout() and jeu.getMiseAJour() > wishlistItem.getDateAjout() %}
-
-<article class="group bg-[#1c1628] border border-[#2e2640] rounded-lg overflow-hidden hover:border-[#f5a623]/60 transition {% if not isAvailable %}opacity-75{% endif %}">
+<article class="group bg-[#1c1628] border border-[#2e2640] rounded-lg overflow-hidden hover:border-[#f5a623]/60 transition">
 
     {# Image #}
     <div class="relative aspect-4/3 bg-[#2a2040] overflow-hidden">
@@ -28,7 +14,7 @@
         {% endif %}
 
         {# Badge "Votre annonce" #}
-        {% if isOwnJeu %}
+        {% if app.user and jeu.vendeur.id == app.user.id %}
             <div class="absolute top-3 left-3 bg-[#f5a623] text-[#111] rounded-sm px-2.5 py-1 flex items-center gap-1.5">
                 <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                     <path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5.951-1.488 5.951 1.488a1 1 0 001.169-1.409l-7-14z" />
@@ -36,50 +22,20 @@
                 <span class="text-xs font-bold">Votre annonce</span>
             </div>
         {% endif %}
-
-        {# Voile si le jeu n'est plus en vente #}
-        {% if not isAvailable %}
-            <div class="absolute inset-0 bg-[#0d0a14]/70 flex items-center justify-center">
-                <p class="text-white font-bold text-lg">
-                    {% if jeu.statut.name == 'VENDU' %}Vendu{% else %}Retiré de la vente{% endif %}
-                </p>
-            </div>
-        {% endif %}
-
-        {# Bouton retirer de la wishlist (page wishlist seulement) #}
-        {% if wishlistItem is defined %}
-            <form action="{{ path('app_jeu_wishlist_toggle', {'id': jeu.id}) }}" method="post" class="absolute top-3 right-3">
-                <input type="hidden" name="_token" value="{{ csrf_token('toggle-wishlist-' ~ jeu.id) }}">
-                <button type="submit"
-                        title="Retirer de la wishlist"
-                        class="bg-[#110d1b]/80 hover:bg-[#ff8a80] hover:text-[#111] text-white rounded-full p-2 transition">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
-                    </svg>
-                </button>
-            </form>
-        {% endif %}
     </div>
 
     <div class="p-5">
-
-        {# Alerte si le jeu a été modifié depuis son ajout à la wishlist #}
-        {% if isModified %}
-            <div class="bg-[#f5a623]/10 border border-[#f5a623]/40 text-[#f5a623] rounded-md px-4 py-3 flex items-start gap-3 mb-4">
-                <svg class="w-5 h-5 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                    <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
-                </svg>
-                <div class="flex-1">
-                    <p class="font-medium text-sm">Ce jeu a été modifié depuis son ajout à la wishlist</p>
-                    <p class="text-xs mt-1 text-[#b9b0cc]">Vérifie que les informations te conviennent toujours</p>
-                </div>
-            </div>
-        {% endif %}
-
         {# Titre et Prix #}
         <div class="flex items-start justify-between gap-3 mb-2">
             <h3 class="font-semibold text-white leading-snug">{{ jeu.titre }}</h3>
-            <span class="shrink-0 text-lg font-bold text-[#f5a623]">{{ jeu.prix }} €</span>
+
+            {# Si le prix a changé, l'ancien est affiché barré au-dessus du nouveau #}
+            <div class="shrink-0 text-right">
+                {% if jeu.prixPrecedent %}
+                    <span class="block text-xs text-[#8a82a0] line-through">{{ jeu.prixPrecedent }} €</span>
+                {% endif %}
+                <span class="text-lg font-bold text-[#f5a623]">{{ jeu.prix }} €</span>
+            </div>
         </div>
 
         {# Description #}
@@ -116,6 +72,9 @@
 
         {# Actions #}
         <div class="flex flex-col sm:flex-row gap-3 mt-3">
+            {% set in_panier = jeu.id in (panierItemsIds|default([])) %}
+            {% set isOwnJeu = app.user and jeu.vendeur.id == app.user.id %}
+
             {% if isOwnJeu %}
                 {# Bouton désactivé pour son propre jeu #}
                 <button disabled class="flex-1 flex items-center justify-center gap-2 font-bold text-sm py-3 px-6 rounded-md bg-[#2e2640] text-[#8a82a0] cursor-not-allowed">
@@ -124,14 +83,10 @@
                     </svg>
                     C'est votre annonce
                 </button>
-            {% elseif not isAvailable %}
-                {# Jeu vendu ou retiré : pas de vente possible #}
-                <button disabled class="flex-1 flex items-center justify-center font-bold text-sm py-3 px-6 rounded-md bg-[#2e2640] text-[#8a82a0] cursor-not-allowed">
-                    {% if jeu.statut.name == 'VENDU' %}Produit vendu{% else %}Produit retiré{% endif %}
-                </button>
             {% else %}
-                {# Bouton Ajouter / Retirer du panier #}
-                <form action="{{ path('app_jeu_cart_toggle', {'id': jeu.id}) }}" method="post" class="flex-1">
+                {# Bouton Ajouter au panier #}
+                <form action="{{ path('app_jeu_cart_toggle', {'id': jeu.id}) }}" method="post"
+                    class="flex-1">
                     <button type="submit"
                             class="w-full flex items-center justify-center gap-2 font-bold text-sm py-3 px-6 rounded-md transition
                                     {% if in_panier %}
@@ -154,8 +109,9 @@
                 </form>
             {% endif %}
 
-            {# Bouton wishlist (pas sur la page wishlist, où le retrait est sur l'image) #}
-            {% if app.user and wishlistItem is not defined %}
+            {% set in_wishlist = app.user and jeu.id in (wishlistItemsIds|default([])) %}
+
+            {% if app.user %}
                 <form action="{{ path('app_jeu_wishlist_toggle', {'id': jeu.id}) }}" method="post">
                     <input type="hidden" name="_token" value="{{ csrf_token('toggle-wishlist-' ~ jeu.id) }}">
                     <button type="submit"
@@ -177,7 +133,7 @@
                         Wishlist
                     </button>
                 </form>
-            {% elseif not app.user %}
+            {% else %}
                 <a href="{{ path('app_login') }}"
                    class="flex items-center justify-center gap-2 border font-medium text-sm py-3 px-6 rounded-md transition border-[#2e2640] hover:border-[#f5a623] text-[#b9b0cc] hover:text-white">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">

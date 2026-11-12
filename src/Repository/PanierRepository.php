@@ -51,7 +51,7 @@ class PanierRepository extends ServiceEntityRepository
     }
 
     // Crée la commande. Lève JeuIndisponibleException si un jeu n'est plus en vente.
-    // $livraison : adresse saisie chez Stripe (peut être null)
+    // $livraison : adresse saisie chez Stripe (peut être null). Elle est aussi enregistrée sur le compte.
     public function checkout(Panier $panier, ?array $livraison = null): Commande
     {
         $em = $this->getEntityManager();
@@ -66,7 +66,7 @@ class PanierRepository extends ServiceEntityRepository
                 $em->lock($jeu, LockMode::PESSIMISTIC_WRITE);
                 $em->refresh($jeu); // on relit le statut depuis la base, après le verrou
 
-                if ($jeu->getStatut() !== JeuStatut::EN_VENTE) {
+                if ($jeu->getStatut() !== JeuStatut::EN_VENTE || $jeu->isMasque()) {
                     throw new JeuIndisponibleException($jeu);
                 }
             }
@@ -77,6 +77,11 @@ class PanierRepository extends ServiceEntityRepository
             $commande->setStatut('payée');
             $commande->setReference(uniqid('CMD-'));
             $commande->setLivraison($livraison);
+
+            // Dernière adresse utilisée, réaffichée sur le compte
+            if ($livraison !== null) {
+                $acheteur->setAdresseLivraison($livraison);
+            }
 
             foreach ($panier->getPanierItems() as $panierItem) {
                 $commandeItem = new CommandeLignes();

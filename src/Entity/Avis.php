@@ -6,7 +6,9 @@ use App\Repository\AvisRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 
+// Un seul avis par commande et par vendeur
 #[ORM\Entity(repositoryClass: AvisRepository::class)]
+#[ORM\UniqueConstraint(name: 'UNIQ_AVIS_COMMANDE_VENDEUR', fields: ['commande', 'vendeur'])]
 class Avis
 {
     #[ORM\Id]
@@ -27,10 +29,11 @@ class Avis
     private ?Commande $commande = null;
 
     #[ORM\Column]
-    #[Assert\Range(1, 5)]
+    #[Assert\Range(min: 1, max: 5)]
     private ?int $note = null;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Assert\Length(max: 255)]
     private ?string $commentaire = null;
 
     #[ORM\Column]

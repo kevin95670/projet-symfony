@@ -4,6 +4,16 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>{% block title %}Replay{% endblock %}</title>
+        <meta name="description" content="Achète et vends tes jeux vidéo d'occasion entre particuliers sur Replay.">
+
+        {# Balises Open Graph : aperçu lors du partage sur les réseaux sociaux. Les pages peuvent les remplacer. #}
+        {% block og %}
+            <meta property="og:site_name" content="Replay">
+            <meta property="og:type" content="website">
+            <meta property="og:title" content="Replay — jeux vidéo d'occasion">
+            <meta property="og:description" content="Achète et vends tes jeux vidéo d'occasion entre particuliers.">
+            <meta property="og:url" content="{{ url('app_home') }}">
+        {% endblock %}
         <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>⚫️</text><text y=%221.3em%22 x=%220.2em%22 font-size=%2276%22 fill=%22%23fff%22>sf</text></svg>">
         {% block stylesheets %}
             <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
@@ -93,23 +103,28 @@
 
                             {# Compte #}
                             {% if app.user %}
-                                <div class="relative group">
-                                    <button class="text-[#b9b0cc] hover:text-[#f5a623] transition" title="Mon compte">
+                                {# Menu ouvert au clic (fonctionne sur téléphone comme sur ordinateur) #}
+                                <details class="relative">
+                                    <summary class="list-none cursor-pointer text-[#b9b0cc] hover:text-[#f5a623] transition [&::-webkit-details-marker]:hidden" title="Mon compte">
                                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                                         </svg>
-                                    </button>
+                                    </summary>
 
-                                    <div class="absolute z-30 right-0 top-full pt-2 w-52 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition">
+                                    <div class="absolute z-30 right-0 top-full pt-2 w-52">
                                         <div class="bg-[#1c1628] border border-[#2e2640] rounded-md shadow-xl py-2">
 
                                             <div class="px-4 py-2 border-b border-[#2e2640]">
                                                 <div class="text-sm font-medium text-white truncate">{{ app.user.pseudo }}</div>
                                             </div>
 
+                                            <a href="{{ path('app_tableau_de_bord') }}" class="block px-4 py-2 text-sm text-[#b9b0cc] hover:bg-[#2e2640] hover:text-white transition">Tableau de bord</a>
                                             <a href="{{ path('app_profil') }}" class="block px-4 py-2 text-sm text-[#b9b0cc] hover:bg-[#2e2640] hover:text-white transition">Mon profil</a>
                                             <a href="{{ path('app_commandes') }}" class="block px-4 py-2 text-sm text-[#b9b0cc] hover:bg-[#2e2640] hover:text-white transition">Mes commandes</a>
                                             <a href="{{ path('app_ventes', {'vendeurId': app.user.id}) }}" class="block px-4 py-2 text-sm text-[#b9b0cc] hover:bg-[#2e2640] hover:text-white transition">Mes ventes</a>
+                                            {% if is_granted('ROLE_ADMIN') %}
+                                                <a href="{{ path('app_admin_signalements') }}" class="block px-4 py-2 text-sm text-[#f5a623] hover:bg-[#2e2640] hover:text-white transition">Signalements (admin)</a>
+                                            {% endif %}
                                             <a href="{{ path('app_wishlist') }}" class="block px-4 py-2 text-sm text-[#b9b0cc] hover:bg-[#2e2640] hover:text-white transition">Ma liste de souhaits</a>
 
                                             <div class="border-t border-[#2e2640] mt-2 pt-2">
@@ -118,7 +133,7 @@
 
                                         </div>
                                     </div>
-                                </div>
+                                </details>
                             {% else %}
                                 <a href="{{ path('app_login') }}" class="text-[#b9b0cc] hover:text-[#f5a623] transition" title="Se connecter">
                                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">

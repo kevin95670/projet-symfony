@@ -1,0 +1,75 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Signalements{% endblock %}
+
+{% block body %}
+<div class="max-w-5xl mx-auto px-4 py-10">
+
+    <h1 class="text-2xl font-bold text-white mb-2">Signalements</h1>
+    <p class="text-sm text-[#8a82a0] mb-8">Toutes les annonces signalées, avec leur historique. Une annonce signalée est masquée jusqu'à ta décision.</p>
+
+    {% for message in app.flashes('success') %}
+        <div class="mb-4 px-4 py-3 rounded-md bg-[#9ae6b4]/10 border border-[#9ae6b4]/30 text-[#9ae6b4] text-sm">{{ message }}</div>
+    {% endfor %}
+    {% for message in app.flashes('error') %}
+        <div class="mb-4 px-4 py-3 rounded-md bg-[#ff8a80]/10 border border-[#ff8a80]/40 text-[#ff8a80] text-sm">{{ message }}</div>
+    {% endfor %}
+
+    {% if parJeu|length == 0 %}
+        <div class="bg-[#1c1628] border border-[#2e2640] rounded-lg p-10 text-center text-[#8a82a0]">Aucun signalement pour le moment.</div>
+    {% else %}
+        <div class="space-y-6">
+            {% for entree in parJeu %}
+                {% set jeu = entree.jeu %}
+                {% set signalements = entree.signalements %}
+                <div class="bg-[#1c1628] border border-[#2e2640] rounded-lg p-6">
+
+                    <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-4">
+                        <div class="min-w-0">
+                            <a href="{{ path('app_jeu', {'slug': jeu.slug, 'id': jeu.id}) }}" class="font-semibold text-white hover:text-[#f5a623] transition">{{ jeu.titre }}</a>
+                            <p class="text-sm text-[#8a82a0]">Vendeur : {{ jeu.vendeur.pseudo }} · {{ signalements|length }} signalement{{ signalements|length > 1 ? 's' : '' }}</p>
+                        </div>
+
+                        <div class="flex items-center gap-3 shrink-0">
+                            {% if jeu.masque %}
+                                <span class="px-2.5 py-1 text-xs font-bold rounded-sm bg-[#ff8a80] text-[#111]">Masquée</span>
+                                <form action="{{ path('app_admin_jeu_restaurer', {'id': jeu.id}) }}" method="post">
+                                    <input type="hidden" name="_token" value="{{ csrf_token('admin-jeu-' ~ jeu.id) }}">
+                                    <button type="submit" class="bg-white hover:bg-[#f5a623] text-[#111] font-bold text-sm py-2 px-4 rounded-md transition">Rétablir</button>
+                                </form>
+                            {% else %}
+                                <span class="px-2.5 py-1 text-xs font-bold rounded-sm bg-[#9ae6b4]/20 text-[#9ae6b4]">Visible</span>
+                                <form action="{{ path('app_admin_jeu_masquer', {'id': jeu.id}) }}" method="post">
+                                    <input type="hidden" name="_token" value="{{ csrf_token('admin-jeu-' ~ jeu.id) }}">
+                                    <input type="text" name="raison" required maxlength="255" placeholder="Raison (envoyée au vendeur)"
+                                           class="bg-[#110d1b] border border-[#2e2640] text-sm text-white rounded-md px-3 py-2 w-56 focus:outline-none focus:border-[#f5a623]">
+                                    <button type="submit" class="border border-[#2e2640] hover:border-[#ff8a80] text-[#b9b0cc] hover:text-white font-medium text-sm py-2 px-4 rounded-md transition">Masquer</button>
+                                </form>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <ul class="divide-y divide-[#2e2640] border-t border-[#2e2640]">
+                        {% for signalement in signalements %}
+                            <li class="py-3 text-sm">
+                                <div class="flex flex-wrap items-center gap-2">
+                                    <span class="font-medium text-white">{{ motifs[signalement.motif] ?? signalement.motif }}</span>
+                                    <span class="text-[#8a82a0]">par {{ signalement.auteur.pseudo }} le {{ signalement.dateCreation|date('d/m/Y H:i') }}</span>
+                                    {% if signalement.traite %}
+                                        <span class="text-xs text-[#9ae6b4]">Traité</span>
+                                    {% endif %}
+                                </div>
+                                {% if signalement.commentaire %}
+                                    <p class="text-[#b9b0cc] mt-1">{{ signalement.commentaire }}</p>
+                                {% endif %}
+                            </li>
+                        {% endfor %}
+                    </ul>
+
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+</div>
+{% endblock %}

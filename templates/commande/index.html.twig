@@ -5,6 +5,13 @@
 {% block body %}
 <div class="max-w-3xl mx-auto px-4 py-12">
 
+    {% for message in app.flashes('success') %}
+        <div class="mb-6 rounded-md bg-[#9ae6b4]/10 border border-[#9ae6b4]/30 text-[#9ae6b4] px-4 py-3 text-sm">{{ message }}</div>
+    {% endfor %}
+    {% for message in app.flashes('error') %}
+        <div class="mb-6 rounded-md bg-[#ff8a80]/10 border border-[#ff8a80]/30 text-[#ff8a80] px-4 py-3 text-sm">{{ message }}</div>
+    {% endfor %}
+
     {# Header #}
     <div class="flex items-center justify-between mb-8">
         <div>
@@ -38,6 +45,8 @@
             {% for ligne in commande.commandeLignes %}
                 {% set sousTotal = ligne.prixUnitaire * ligne.quantite %}
                 {% set total = total + sousTotal %}
+                {% set vendeurId = ligne.jeu.vendeur.id %}
+                {% set monAvis = commande.avis|filter(a => a.vendeur.id == vendeurId)|first %}
 
                 <li class="flex items-center gap-4 px-6 py-5">
 
@@ -85,6 +94,35 @@
                                     J'ai bien reçu mon jeu
                                 </button>
                             </form>
+                        {% endif %}
+
+                        {# Avis sur le vendeur, une fois le jeu reçu #}
+                        {% if ligne.statut.value == 'recue' %}
+                            {% if monAvis %}
+                                <p class="mt-3 text-xs text-[#8a82a0]">
+                                    Ton avis sur {{ ligne.jeu.vendeur.pseudo }} : <span class="text-[#f5a623] font-medium">{{ monAvis.note }}/5</span>
+                                    {% if monAvis.commentaire %}<span class="text-[#b9b0cc]"> · « {{ monAvis.commentaire }} »</span>{% endif %}
+                                </p>
+                            {% else %}
+                                <form method="post" action="{{ path('app_avis_creer', {'id': commande.id, 'vendeurId': vendeurId}) }}" class="mt-3 space-y-2">
+                                    <input type="hidden" name="_token" value="{{ csrf_token('avis-' ~ commande.id ~ '-' ~ vendeurId) }}">
+                                    <div class="flex flex-col sm:flex-row gap-2">
+                                        <select name="note" required class="bg-[#110d1b] border border-[#2e2640] text-white text-xs rounded-md px-3 py-2 focus:outline-none focus:border-[#f5a623]">
+                                            <option value="">Note</option>
+                                            <option value="5">5 / 5</option>
+                                            <option value="4">4 / 5</option>
+                                            <option value="3">3 / 5</option>
+                                            <option value="2">2 / 5</option>
+                                            <option value="1">1 / 5</option>
+                                        </select>
+                                        <input type="text" name="commentaire" maxlength="255" placeholder="Ton commentaire (facultatif)"
+                                               class="flex-1 bg-[#110d1b] border border-[#2e2640] text-white text-xs rounded-md px-3 py-2 placeholder-[#5d5573] focus:outline-none focus:border-[#f5a623]">
+                                        <button type="submit" class="bg-white hover:bg-[#f5a623] text-[#111] text-xs font-bold px-4 py-2 rounded-md transition">
+                                            Laisser mon avis
+                                        </button>
+                                    </div>
+                                </form>
+                            {% endif %}
                         {% endif %}
                     </div>
 
