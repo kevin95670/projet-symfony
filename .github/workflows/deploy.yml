@@ -1,0 +1,66 @@
+name: Déploiement Replay
+
+on:
+  push:
+    branches: [master]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Récupérer le code
+        uses: actions/checkout@v4
+
+      - name: Installer PHP 8.3 et Composer
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: ctype, iconv, intl, mbstring, pdo_mysql, xml, curl, zip
+          tools: composer
+
+      - name: Installer les dépendances de production
+        run: composer install --no-dev --optimize-autoloader --no-interaction --no-scripts
+
+      - name: Préparer la clé SSH
+        env:
+          SSH_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          SSH_HOST: ${{ secrets.SSH_HOST }}
+          SSH_PORT: ${{ secrets.SSH_PORT }}
+        run: |
+          mkdir -p ~/.ssh
+          printf '%s\n' "$SSH_KEY" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          ssh-keyscan -p "$SSH_PORT" "$SSH_HOST" >> ~/.ssh/known_hosts
+
+      - name: Envoyer le projet sur le serveur
+        env:
+          SSH_HOST: ${{ secrets.SSH_HOST }}
+          SSH_PORT: ${{ secrets.SSH_PORT }}
+          SSH_USER: ${{ secrets.SSH_USER }}
+        run: |
+          rsync -az --delete \
+            -e "ssh -p $SSH_PORT -i ~/.ssh/deploy_key" \
+            --exclude '.git/' \
+            --exclude '.github/' \
+            --exclude 'tests/' \
+            --exclude 'var/' \
+            --exclude 'public/uploads/' \
+            --exclude '.env.local' \
+            --exclude '.env.*.local' \
+            ./ "$SSH_USER@$SSH_HOST:domains/replay.kevinleonard.fr/replay/"
+
+      - name: Migrations et cache sur le serveur
+        env:
+          SSH_HOST: ${{ secrets.SSH_HOST }}
+          SSH_PORT: ${{ secrets.SSH_PORT }}
+          SSH_USER: ${{ secrets.SSH_USER }}
+        run: |
+          ssh -p "$SSH_PORT" -i ~/.ssh/deploy_key "$SSH_USER@$SSH_HOST" <<'EOF'
+            cd domains/replay.kevinleonard.fr/replay
+            PHP=/opt/alt/php83/usr/bin/php
+            $PHP bin/console doctrine:migrations:migrate --env=prod --no-interaction
+            $PHP bin/console cache:clear --env=prod
+            $PHP bin/console cache:warmup --env=prod
+          EOF
